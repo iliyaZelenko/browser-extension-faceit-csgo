@@ -54,14 +54,14 @@
                 {{ playerSearch.nickname }}
                 <img
                   v-if="playerSearch.verified"
-                  :src="$browser.extension.getURL(`assets/verified.png`)"
+                  :src="$browser.runtime.getURL(`assets/verified.png`)"
                   alt="verified"
                   style="width: 16px;"
                 >
               </span>
 
               <img
-                :src="$browser.extension.getURL(`assets/skill_level_${getPlayerSearchLvl(playerSearch)}_svg.svg`)"
+                :src="$browser.runtime.getURL(`assets/skill_level_${getPlayerSearchLvl(playerSearch)}_svg.svg`)"
                 alt="lvl icon"
                 style="width: 32px; margin-left: auto;"
               >
@@ -189,7 +189,7 @@ export default {
       if (this.nickname.length < 3) {
         browser.notifications.create({
           type: 'basic',
-          iconUrl: browser.extension.getURL('icons/page-48.png'),
+          iconUrl: browser.runtime.getURL('icons/page-48.png'),
           title: 'Nickname must be at least 2 characters.',
           message: ''
         })
@@ -214,11 +214,13 @@ export default {
         if (e.response.status === 404) {
           browser.notifications.create({
             'type': 'basic',
-            'iconUrl': browser.extension.getURL('icons/icon_48.png'),
+            'iconUrl': browser.runtime.getURL('icons/icon_48.png'),
             'title': 'Player not found.',
             'message': `Nickname ${this.nickname} not found.`
           })
         }
+
+        console.log(e)
 
         this.player = null
       }
@@ -229,8 +231,6 @@ export default {
 
       // gets all statistics
       if (this.player) {
-        console.log(this.player)
-
         try {
           this.fullStats = await this.$get(`https://open.faceit.com/data/v4/players/${this.player.player_id}/stats/csgo`, {
             headers: this.API_HEADERS
@@ -239,7 +239,7 @@ export default {
           if (e.response.status === 404) {
             browser.notifications.create({
               'type': 'basic',
-              'iconUrl': browser.extension.getURL('icons/icon_48.png'),
+              'iconUrl': browser.runtime.getURL('icons/icon_48.png'),
               'title': 'Error from server.',
               'message': e.response.data.errors[0].message
             })
@@ -291,7 +291,6 @@ export default {
     },
     avatarOrDefault (avatar) {
       if (!avatar || avatar === 'https://d50m6q67g4bn3.cloudfront.net/avatars/084a317c-6346-4dde-ab85-744f469fc217_1464715706995') {
-        console.log(123, this.defaultAvatar)
         return this.defaultAvatar
       }
 

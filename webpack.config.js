@@ -8,6 +8,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 const { version } = require('./package.json')
 
 const config = {
+  devtool: 'cheap-module-source-map',
   mode: process.env.NODE_ENV,
   context: __dirname + '/src',
   entry: {
@@ -73,7 +74,10 @@ const config = {
           jsonContent.version = version
 
           if (config.mode === 'development') {
-            jsonContent['content_security_policy'] = "script-src 'self' 'unsafe-eval'; object-src 'self'"
+            jsonContent['content_security_policy'] = {
+              // unsafe-eval
+              extension_pages: "script-src 'self'; object-src 'self'"
+            }
           }
 
           return JSON.stringify(jsonContent, null, 2)

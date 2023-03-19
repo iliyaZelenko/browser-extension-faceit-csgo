@@ -10,13 +10,11 @@
 
           <b>{{ nickname }}</b>
         </a>
-        (
         <img
-          :src="`https://www.countryflags.io/${player.country}/flat/16.png`"
+          :src="`https://flagsapi.com/${player.country.toUpperCase()}/flat/16.png`"
           alt="flag"
           style="vertical-align: middle;"
         >
-        )
       </div>
       <!--
       <img
@@ -38,14 +36,14 @@
       </div>-->
 
       <div
-        v-if="csgoStats && csgoStats.skill_level_label && fullStats"
+        v-if="csgoStats && csgoStats.skill_level && fullStats"
         style="padding: 0 10px;"
       >
         <p style="display: flex; align-items: center;">
           {{ $browser.i18n.getMessage('level') }}
-          <!--<b class="value">{{ csgoStats.skill_level_label }}</b>.-->
+          <!--<b class="value">{{ csgoStats.skill_level }}</b>.-->
           <img
-            :src="$browser.extension.getURL(`assets/skill_level_${csgoStats.skill_level}_svg.svg`)"
+            :src="$browser.runtime.getURL(`assets/skill_level_${csgoStats.skill_level}_svg.svg`)"
             alt="lvl icon"
             style="width: 32px; margin-left: 6px;"
           >
@@ -56,7 +54,7 @@
         </p>
 
         <p>
-          {{ $browser.i18n.getMessage('eloRangeFor', csgoStats.skill_level_label) }}
+          {{ $browser.i18n.getMessage('eloRangeFor', csgoStats.skill_level) }}
           <b class="value">{{ currentLvl.range[0] }} - {{ currentLvl.range[1] === maxElo ? '∞' : currentLvl.range[1] }}</b>.
         </p>
 
@@ -175,14 +173,14 @@ export default {
     currentLvl () {
       // faceit может иметь 0 эло
       const elo = Math.max(this.csgoStats.faceit_elo, 1)
-      const range = this.lvls.find(i => i.range[0] <= elo && elo <= i.range[1] && i.label === this.csgoStats.skill_level_label)
+      const range = this.lvls.find(i => i.range[0] <= elo && elo <= i.range[1] && i.label === this.csgoStats.skill_level.toString())
 
       if (!range) {
         browser.notifications.create({
           'type': 'basic',
-          'iconUrl': browser.extension.getURL('icons/icon_48.png'),
+          'iconUrl': browser.runtime.getURL('icons/icon_48.png'),
           'title': 'Invalid profile.',
-          'message': `This player has a mismatch of elo points (${elo} elo) to his lvl (${this.csgoStats.skill_level_label} lvl).`
+          'message': `This player has a mismatch of elo points (${elo} elo) to his lvl (${this.csgoStats.skill_level} lvl).`
         })
 
         this.$emit('profile-error')
@@ -214,7 +212,6 @@ export default {
       // }
     },
     saveNickname () {
-      console.log(222)
       this.$emit('set-local-storage-nickname', this.nickname)
     }
   }
@@ -286,7 +283,7 @@ export default {
           "selected_ladder_id": "24e6d014-7613-428a-8600-fedfee6dc718"
         }
       },
-      "skill_level_label": "10",
+      "skill_level": "10",
       "game_player_id": "76561198224479636",
       "skill_level": 10,
       "faceit_elo": 2130,
