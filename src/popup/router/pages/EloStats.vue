@@ -1,122 +1,120 @@
 <template>
-  <div>
-    <div v-if="player">
-      <div style="text-align: center; margin-bottom: 10px;">
-        <a
-          href="#"
-          @click="openProfile"
-        >
-          {{ $browser.i18n.getMessage('goToProfile') }}
+  <div v-if="player" class="elo-stats-wrapper">
+    <div style="text-align: center; margin-bottom: 10px;">
+      <a
+        href="#"
+        @click="openProfile"
+      >
+        {{ $browser.i18n.getMessage('goToProfile') }}
 
-          <b>{{ nickname }}</b>
-        </a>
-        <img
-          :src="`https://flagsapi.com/${player.country.toUpperCase()}/flat/16.png`"
-          alt="flag"
-          style="vertical-align: middle;"
-        >
-      </div>
-      <!--
+        <b>{{ nickname }}</b>
+      </a>
       <img
-        v-if="player.avatar"
-        :src="player.avatar"
-        alt="Avatar"
-        style="width: 100%;"
-      >-->
-      <!--
-      <div style="display: flex; justify-content: center;">
+        :src="`https://flagsapi.com/${player.country.toUpperCase()}/flat/16.png`"
+        alt="flag"
+        style="vertical-align: middle;"
+      >
+    </div>
+    <!--
+    <img
+      v-if="player.avatar"
+      :src="player.avatar"
+      alt="Avatar"
+      style="width: 100%;"
+    >-->
+    <!--
+    <div style="display: flex; justify-content: center;">
+      <div
+        v-for="(result, i) in fullStats.lifetime['Recent Results']"
+        :key="'last-result-' + i"
+      >
+        <span :class="(+result ? 'win-result' : 'lose-result') + '  result'">
+          {{ +result ? 'W' : 'L' }}
+        </span>
+      </div>
+    </div>-->
+
+    <div
+      v-if="csgoStats && csgoStats.skill_level && fullStats"
+      style="padding: 0 5px;"
+    >
+      <p style="display: flex; align-items: center;">
+        {{ $browser.i18n.getMessage('level') }}
+        <!--<b class="value">{{ csgoStats.skill_level }}</b>.-->
+        <img
+          :src="$browser.runtime.getURL(`assets/skill_level_${csgoStats.skill_level}_svg.svg`)"
+          alt="lvl icon"
+          style="width: 32px; margin-left: 6px;"
+        >
+      </p>
+      <p>
+        {{ $browser.i18n.getMessage('elo') }}
+        <b class="value">{{ csgoStats.faceit_elo }}</b>.
+      </p>
+
+      <p>
+        {{ $browser.i18n.getMessage('eloRangeFor', csgoStats.skill_level) }}
+        <b class="value">{{ currentLvl.range[0] }} - {{ currentLvl.range[1] === maxElo ? '∞' : currentLvl.range[1] }}</b>.
+      </p>
+
+      <!-- Progress -->
+      <template v-if="csgoStats.skill_level < 10">
         <div
+          :data-label="progressLabel"
+          class="progress"
+        >
+          <span
+            class="value"
+            :style="`width: ${Math.floor(csgoStats.faceit_elo / currentLvlNextLvlStart * 100)}%;`"
+          />
+        </div>
+      </template>
+
+      <p>
+        <span v-if="csgoStats.skill_level < 10">
+          {{ $browser.i18n.getMessage('playerCanRaiseLvlIfHeGets') }}
+          <b class="value">{{ lvls[currentLvlIndex + 1].range[0] - csgoStats.faceit_elo }}</b> elo.
+        </span>
+        <span v-else>
+          {{ $browser.i18n.getMessage('playerHas') }}
+          <b class="value">{{ $browser.i18n.getMessage('maximalLvl') }}</b>.
+        </span>
+      </p>
+
+      <p>
+        <span v-if="csgoStats.skill_level > 1">
+          {{ $browser.i18n.getMessage('playerMayLoseLvlIfHeLoses') }}
+          <b class="value">{{ csgoStats.faceit_elo - lvls[currentLvlIndex - 1].range[1] }}</b> elo.
+        </span>
+        <span v-else>
+          {{ $browser.i18n.getMessage('playerHas') }}
+          <b class="value">{{ $browser.i18n.getMessage('minimalLvl') }}</b>.
+        </span>
+      </p>
+
+      <p>
+        {{ $browser.i18n.getMessage('recentResults') }}
+        <span
           v-for="(result, i) in fullStats.lifetime['Recent Results']"
           :key="'last-result-' + i"
         >
           <span :class="(+result ? 'win-result' : 'lose-result') + '  result'">
             {{ +result ? 'W' : 'L' }}
           </span>
-        </div>
-      </div>-->
+        </span>
+      </p>
+    </div>
 
-      <div
-        v-if="csgoStats && csgoStats.skill_level && fullStats"
-        style="padding: 0 10px;"
-      >
-        <p style="display: flex; align-items: center;">
-          {{ $browser.i18n.getMessage('level') }}
-          <!--<b class="value">{{ csgoStats.skill_level }}</b>.-->
-          <img
-            :src="$browser.runtime.getURL(`assets/skill_level_${csgoStats.skill_level}_svg.svg`)"
-            alt="lvl icon"
-            style="width: 32px; margin-left: 6px;"
-          >
-        </p>
-        <p>
-          Elo:
-          <b class="value">{{ csgoStats.faceit_elo }}</b>.
-        </p>
-
-        <p>
-          {{ $browser.i18n.getMessage('eloRangeFor', csgoStats.skill_level) }}
-          <b class="value">{{ currentLvl.range[0] }} - {{ currentLvl.range[1] === maxElo ? '∞' : currentLvl.range[1] }}</b>.
-        </p>
-
-        <!-- Progress -->
-        <template v-if="csgoStats.skill_level < 10">
-          <div
-            :data-label="progressLabel"
-            class="progress"
-          >
-            <span
-              class="value"
-              :style="`width: ${Math.floor(csgoStats.faceit_elo / currentLvlNextLvlStart * 100)}%;`"
-            />
-          </div>
-        </template>
-
-        <p>
-          <span v-if="csgoStats.skill_level < 10">
-            {{ $browser.i18n.getMessage('playerCanRaiseLvlIfHeGets') }}
-            <b class="value">{{ lvls[currentLvlIndex + 1].range[0] - csgoStats.faceit_elo }}</b> elo.
-          </span>
-          <span v-else>
-            {{ $browser.i18n.getMessage('playerHas') }}
-            <b class="value">{{ $browser.i18n.getMessage('maximalLvl') }}</b>.
-          </span>
-        </p>
-
-        <p>
-          <span v-if="csgoStats.skill_level > 1">
-            {{ $browser.i18n.getMessage('playerMayLoseLvlIfHeLoses') }}
-            <b class="value">{{ csgoStats.faceit_elo - lvls[currentLvlIndex - 1].range[1] }}</b> elo.
-          </span>
-          <span v-else>
-            {{ $browser.i18n.getMessage('playerHas') }}
-            <b class="value">{{ $browser.i18n.getMessage('minimalLvl') }}</b>.
-          </span>
-        </p>
-
-        <p>
-          {{ $browser.i18n.getMessage('recentResults') }}
-          <span
-            v-for="(result, i) in fullStats.lifetime['Recent Results']"
-            :key="'last-result-' + i"
-          >
-            <span :class="(+result ? 'win-result' : 'lose-result') + '  result'">
-              {{ +result ? 'W' : 'L' }}
-            </span>
-          </span>
-        </p>
-      </div>
-
-      <div style="text-align: center; margin-top: 10px;">
-        <button @click="saveNickname">
-          {{ $browser.i18n.getMessage('showThisProfileAfterOpening') }}
-          <span
-            v-if="localStorageNickname === nickname"
-            style="color: darkgreen;"
-          >
-            {{ $browser.i18n.getMessage('saved') }}
-          </span>
-        </button>
-      </div>
+    <div style="text-align: center; margin-top: 10px;">
+      <button @click="saveNickname">
+        {{ $browser.i18n.getMessage('showThisProfileAfterOpening') }}
+        <span
+          v-if="localStorageNickname === nickname"
+          style="color: darkgreen;"
+        >
+          {{ $browser.i18n.getMessage('saved') }}
+        </span>
+      </button>
     </div>
   </div>
 </template>
@@ -219,6 +217,20 @@ export default {
 </script>
 
 <style scoped>
+  .elo-stats-wrapper {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(245, 85, 0, 0.3);
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  .value {
+    color: #f50;
+    font-weight: bold;
+  }
+
   .win-result {
     color: #5dbb29 !important;
   }

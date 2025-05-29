@@ -30,11 +30,11 @@
     },
 
     "showEloStats": {
-        "message": "Show elo stats"
+        "message": "Elo"
     },
 
     "showFullStats": {
-        "message": "Show full stats"
+        "message": "Stats"
     },
 
     "level": {
@@ -127,6 +127,90 @@
     },
 
     "clickForDetailedStats": {
-        "message": "Click for detailed statistics"
+        "message": "Click for detailed stats"
+    },
+
+    "elo": {
+        "message": "Elo:"
+    },
+
+    "playerSearchPlaceholder": {
+        "message": "Enter player nickname"
+    },
+
+    "kdRatio": {
+        "message": "K/D Ratio"
+    },
+
+    "headshotsPercentage": {
+        "message": "Headshots Percentage"
+    },
+
+    "averageKills": {
+        "message": "Average Kills"
+    },
+
+    "averageDeaths": {
+        "message": "Average Deaths"
+    },
+
+    "averageAssists": {
+        "message": "Average Assists"
+    },
+
+    "averageMvps": {
+        "message": "Average MVPs"
+    },
+
+    "totalKills": {
+        "message": "Total Kills:"
+    },
+
+    "totalDeaths": {
+        "message": "Total Deaths:"
+    },
+
+    "totalAssists": {
+        "message": "Total Assists:"
+    },
+
+    "headshotsPerMatch": {
+        "message": "Headshots per Match:"
+    },
+
+    "tripleKills": {
+        "message": "Triple Kills:"
+    },
+
+    "quadroKills": {
+        "message": "Quadro Kills:"
+    },
+
+    "pentaKills": {
+        "message": "Penta Kills:"
+    },
+
+    "totalRounds": {
+        "message": "Total Rounds:"
+    },
+
+    "statsNotLoaded": {
+        "message": "Statistics data not loaded."
+    },
+
+    "back": {
+        "message": "Back"
+    },
+
+    "map": {
+        "message": "Map"
+    },
+
+    "mapNotFound": {
+        "message": "not found in statistics."
+    },
+
+    "loadingMapStats": {
+        "message": "Loading map statistics..."
     }
 }

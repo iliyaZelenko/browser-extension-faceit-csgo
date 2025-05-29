@@ -37,7 +37,7 @@
             <div class="stat-icon">
               <i class="fas fa-crosshairs"></i>
             </div>
-            <div class="stat-title">K/D соотношение</div>
+            <div class="stat-title">{{ $browser.i18n.getMessage('kdRatio') }}</div>
             <div class="stat-value-big">{{ mapData.stats['Average K/D Ratio'] }}</div>
           </div>
           
@@ -45,7 +45,7 @@
             <div class="stat-icon">
               <i class="fas fa-bullseye"></i>
             </div>
-            <div class="stat-title">Процент хедшотов</div>
+            <div class="stat-title">{{ $browser.i18n.getMessage('headshotsPercentage') }}</div>
             <div class="stat-value-big">{{ mapData.stats['Average Headshots %'] }}%</div>
           </div>
 
@@ -53,7 +53,7 @@
             <div class="stat-icon">
               <i class="fas fa-fire"></i>
             </div>
-            <div class="stat-title">Средние убийства</div>
+            <div class="stat-title">{{ $browser.i18n.getMessage('averageKills') }}</div>
             <div class="stat-value-big">{{ mapData.stats['Average Kills'] }}</div>
           </div>
 
@@ -61,7 +61,7 @@
             <div class="stat-icon">
               <i class="fas fa-skull"></i>
             </div>
-            <div class="stat-title">Средние смерти</div>
+            <div class="stat-title">{{ $browser.i18n.getMessage('averageDeaths') }}</div>
             <div class="stat-value-big">{{ mapData.stats['Average Deaths'] }}</div>
           </div>
 
@@ -69,7 +69,7 @@
             <div class="stat-icon">
               <i class="fas fa-handshake"></i>
             </div>
-            <div class="stat-title">Средние ассисты</div>
+            <div class="stat-title">{{ $browser.i18n.getMessage('averageAssists') }}</div>
             <div class="stat-value-big">{{ mapData.stats['Average Assists'] }}</div>
           </div>
 
@@ -77,7 +77,7 @@
             <div class="stat-icon">
               <i class="fas fa-crown"></i>
             </div>
-            <div class="stat-title">Средние MVP</div>
+            <div class="stat-title">{{ $browser.i18n.getMessage('averageMvps') }}</div>
             <div class="stat-value-big">{{ mapData.stats['Average MVPs'] }}</div>
           </div>
         </div>
@@ -88,56 +88,56 @@
             <div class="additional-stat">
               <span class="stat-with-icon">
                 <i class="fas fa-crosshairs"></i>
-                Всего убийств:
+                {{ $browser.i18n.getMessage('totalKills') }}
               </span>
               <span class="value">{{ mapData.stats['Kills'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
                 <i class="fas fa-skull-crossbones"></i>
-                Всего смертей:
+                {{ $browser.i18n.getMessage('totalDeaths') }}
               </span>
               <span class="value">{{ mapData.stats['Deaths'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
                 <i class="fas fa-hands-helping"></i>
-                Всего ассистов:
+                {{ $browser.i18n.getMessage('totalAssists') }}
               </span>
               <span class="value">{{ mapData.stats['Assists'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
                 <i class="fas fa-dot-circle"></i>
-                Хедшоты за матч:
+                {{ $browser.i18n.getMessage('headshotsPerMatch') }}
               </span>
               <span class="value">{{ mapData.stats['Headshots per Match'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
                 <i class="fas fa-medal"></i>
-                Тройные убийства:
+                {{ $browser.i18n.getMessage('tripleKills') }}
               </span>
               <span class="value">{{ mapData.stats['Triple Kills'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
                 <i class="fas fa-trophy"></i>
-                Четверные убийства:
+                {{ $browser.i18n.getMessage('quadroKills') }}
               </span>
               <span class="value">{{ mapData.stats['Quadro Kills'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
                 <i class="fas fa-star"></i>
-                Пятерные убийства:
+                {{ $browser.i18n.getMessage('pentaKills') }}
               </span>
               <span class="value">{{ mapData.stats['Penta Kills'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
                 <i class="fas fa-clock"></i>
-                Всего раундов:
+                {{ $browser.i18n.getMessage('totalRounds') }}
               </span>
               <span class="value">{{ mapData.stats['Rounds'] }}</span>
             </div>
@@ -154,19 +154,19 @@
     
     <div v-else class="loading">
       <div v-if="!fullStats || !fullStats.segments">
-        <p>Данные о статистике не загружены.</p>
+        <p>{{ $browser.i18n.getMessage('statsNotLoaded') }}</p>
         <button @click="goBack" class="back-button">
-          ← Назад
+          ← {{ $browser.i18n.getMessage('back') }}
         </button>
       </div>
       <div v-else-if="$route.params.mapLabel && !mapData">
-        <p>Карта "{{ $route.params.mapLabel }}" не найдена в статистике.</p>
+        <p>{{ $browser.i18n.getMessage('map') }} "{{ $route.params.mapLabel }}" {{ $browser.i18n.getMessage('mapNotFound') }}</p>
         <button @click="goBack" class="back-button">
-          ← Назад к списку карт
+          ← {{ $browser.i18n.getMessage('backToMapsList') }}
         </button>
       </div>
       <div v-else>
-        Загрузка статистики карты...
+        {{ $browser.i18n.getMessage('loadingMapStats') }}
       </div>
     </div>
   </div>

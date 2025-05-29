@@ -29,11 +29,11 @@
     },
 
     "showEloStats": {
-        "message": "Эло статистика"
+        "message": "Эло"
     },
 
     "showFullStats": {
-        "message": "Вся статистика"
+        "message": "Статистика"
     },
 
     "level": {
@@ -127,5 +127,89 @@
 
     "clickForDetailedStats": {
         "message": "Нажмите для детальной статистики"
+    },
+
+    "elo": {
+        "message": "Elo:"
+    },
+
+    "playerSearchPlaceholder": {
+        "message": "Введите никнейм игрока"
+    },
+
+    "kdRatio": {
+        "message": "K/D соотношение"
+    },
+
+    "headshotsPercentage": {
+        "message": "Процент хедшотов"
+    },
+
+    "averageKills": {
+        "message": "Средние убийства"
+    },
+
+    "averageDeaths": {
+        "message": "Средние смерти"
+    },
+
+    "averageAssists": {
+        "message": "Средние ассисты"
+    },
+
+    "averageMvps": {
+        "message": "Средние MVP"
+    },
+
+    "totalKills": {
+        "message": "Всего убийств:"
+    },
+
+    "totalDeaths": {
+        "message": "Всего смертей:"
+    },
+
+    "totalAssists": {
+        "message": "Всего ассистов:"
+    },
+
+    "headshotsPerMatch": {
+        "message": "Хедшоты за матч:"
+    },
+
+    "tripleKills": {
+        "message": "Тройные убийства:"
+    },
+
+    "quadroKills": {
+        "message": "Четверные убийства:"
+    },
+
+    "pentaKills": {
+        "message": "Пятерные убийства:"
+    },
+
+    "totalRounds": {
+        "message": "Всего раундов:"
+    },
+
+    "statsNotLoaded": {
+        "message": "Данные о статистике не загружены."
+    },
+
+    "back": {
+        "message": "Назад"
+    },
+
+    "map": {
+        "message": "Карта"
+    },
+
+    "mapNotFound": {
+        "message": "не найдена в статистике."
+    },
+
+    "loadingMapStats": {
+        "message": "Загрузка статистики карты..."
     }
 }

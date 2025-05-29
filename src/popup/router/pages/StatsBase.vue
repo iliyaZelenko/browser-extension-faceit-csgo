@@ -27,7 +27,7 @@
           :loading="loading"
           item-text="nickname"
           item-value="nickname"
-          placeholder="Enter player nickname"
+          :placeholder="$browser.i18n.getMessage('playerSearchPlaceholder')"
           style="width: 100%;"
           disable-filtering-by-search
           @search="onSearch"
@@ -85,28 +85,10 @@
         -->
       </div>
 
-      <div
+      <AnimatedTabs 
         v-if="player"
-        style="text-align: center; margin-top: 10px; margin-bottom: 20px;"
-      >
-        <router-link
-          :to="{ name: 'index' }"
-          class="page-link"
-          exact
-        >
-          {{ $browser.i18n.getMessage('showEloStats') }}
-        </router-link>
-
-        <!-- gap -->
-        <div style="width: 30px; display: inline-block;" />
-
-        <router-link
-          :to="{ name: 'full-stats' }"
-          class="page-link"
-        >
-          {{ $browser.i18n.getMessage('showFullStats') }}
-        </router-link>
-      </div>
+        :tabs="tabs"
+      />
 
       <!-- VIEW -->
       <router-view
@@ -124,9 +106,10 @@
 
 <script>
 import { CoolSelect } from 'vue-cool-select'
+import AnimatedTabs from './components/AnimatedTabs.vue'
 
 export default {
-  components: { CoolSelect },
+  components: { CoolSelect, AnimatedTabs },
   data () {
     const TOKEN = 'Bearer 8c142d35-ba07-4de6-a14a-9f1e3e6109e8'
     const API_HEADERS = {
@@ -170,6 +153,26 @@ export default {
           : this.defaultAvatar
 
       return `url(${avatar})`
+    },
+    tabs() {
+      return [
+        {
+          name: 'index',
+          to: { name: 'index' },
+          icon: 'fas fa-chart-line',
+          label: (this.$browser && this.$browser.i18n && this.$browser.i18n.getMessage) 
+            ? this.$browser.i18n.getMessage('showEloStats') 
+            : 'Elo'
+        },
+        {
+          name: 'full-stats',
+          to: { name: 'full-stats' },
+          icon: 'fas fa-chart-bar',
+          label: (this.$browser && this.$browser.i18n && this.$browser.i18n.getMessage) 
+            ? this.$browser.i18n.getMessage('showFullStats') 
+            : 'Full'
+        }
+      ]
     }
   },
   async created () {
@@ -303,17 +306,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .page-link {
-    /*color: #FFC107 !important;*/
-    color: white !important;
-    font-size: 1.25rem;
-
-  &.router-link-active {
-    color: #f50 !important;
-     /*color: #ffeb3b !important;*/
-   }
-  }
-
   #background {
     position: absolute;
     width: 100%;
