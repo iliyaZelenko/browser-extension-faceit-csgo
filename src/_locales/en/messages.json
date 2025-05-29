@@ -1,116 +1,132 @@
 {
-  "extensionName": {
-    "message": "Faceit elo statistics",
-    "description": "Name of the extension."
-  },
+    "extensionName": {
+        "message": "Faceit elo statistics",
+        "description": "Name of the extension."
+    },
 
-  "extensionDescription": {
-    "message": "Shows a notification when the user clicks on links.",
-    "description": "Description of the extension."
-  },
+    "extensionDescription": {
+        "message": "Shows a notification when the user clicks on links.",
+        "description": "Description of the extension."
+    },
 
-  "goToProfile": {
-    "message": "Open profile",
-    "description": ""
-  },
+    "goToProfile": {
+        "message": "Open profile",
+        "description": ""
+    },
 
-  "searchPlayerNoPlayeyFoundByRequest": {
-    "message": "No player found by request.",
-    "description": ""
-  },
+    "searchPlayerNoPlayeyFoundByRequest": {
+        "message": "No player found by request.",
+        "description": ""
+    },
 
-  "searchPlayerMinimalLettersInfo": {
-    "message": "We need at least $lettersCount$ letters to search.",
-    "description": "",
-    "placeholders": {
-      "lettersCount": {
-        "content": "$1"
-      }
+    "searchPlayerMinimalLettersInfo": {
+        "message": "We need at least $lettersCount$ letters to search.",
+        "description": "",
+        "placeholders": {
+            "lettersCount": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "showEloStats": {
+        "message": "Show elo stats"
+    },
+
+    "showFullStats": {
+        "message": "Show full stats"
+    },
+
+    "level": {
+        "message": "Level: "
+    },
+
+    "eloRangeFor": {
+        "message": "Elo range for $lvl$ lvl:",
+        "placeholders": {
+            "lvl": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "playerCanRaiseLvlIfHeGets": {
+        "message": "Player can raise LVL if he gets "
+    },
+
+    "playerHas": {
+        "message": "Player has "
+    },
+
+    "maximalLvl": {
+        "message": "maximal lvl"
+    },
+
+    "minimalLvl": {
+        "message": "minimal lvl"
+    },
+
+    "playerMayLoseLvlIfHeLoses": {
+        "message": "Player may lose lvl if he loses"
+    },
+
+    "recentResults": {
+        "message": "Recent results: "
+    },
+
+    "showThisProfileAfterOpening": {
+        "message": "Show this profile after opening"
+    },
+
+    "saved": {
+        "message": " (Saved)"
+    },
+
+    "averageHeadshots": {
+        "message": "Average Headshots: "
+    },
+
+    "averageKDRatio": {
+        "message": "Average K/D Ratio: "
+    },
+
+    "currentWinStreak": {
+        "message": "Current Win Streak: "
+    },
+
+    "matches": {
+        "message": "Matches: "
+    },
+
+    "wins": {
+        "message": "Wins: "
+    },
+
+    "winRate": {
+        "message": "Win Rate: "
+    },
+
+    "longestWinStreak": {
+        "message": "Longest Win Streak: "
+    },
+
+    "statsByMap": {
+        "message": "Stats by map"
+    },
+
+    "mapDetailedStats": {
+        "message": "Detailed Statistics"
+    },
+
+    "mapAdditionalStats": {
+        "message": "Additional Statistics"
+    },
+
+    "backToMapsList": {
+        "message": "Back to maps list"
+    },
+
+    "clickForDetailedStats": {
+        "message": "Click for detailed statistics"
     }
-  },
-
-  "showEloStats": {
-    "message": "Show elo stats"
-  },
-
-  "showFullStats": {
-    "message": "Show full stats"
-  },
-
-  "level": {
-    "message": "Level: "
-  },
-
-  "eloRangeFor": {
-    "message": "Elo range for $lvl$ lvl:",
-    "placeholders": {
-      "lvl": {
-        "content": "$1"
-      }
-    }
-  },
-
-  "playerCanRaiseLvlIfHeGets": {
-    "message": "Player can raise LVL if he gets "
-  },
-
-  "playerHas": {
-    "message": "Player has "
-  },
-
-  "maximalLvl": {
-    "message": "maximal lvl"
-  },
-
-  "minimalLvl": {
-    "message": "minimal lvl"
-  },
-
-  "playerMayLoseLvlIfHeLoses": {
-    "message": "Player may lose lvl if he loses"
-  },
-
-  "recentResults": {
-    "message": "Recent results: "
-  },
-
-  "showThisProfileAfterOpening": {
-    "message": "Show this profile after opening"
-  },
-
-  "saved": {
-    "message": " (Saved)"
-  },
-
-  "averageHeadshots": {
-    "message": "Average Headshots: "
-  },
-
-  "averageKDRatio": {
-    "message": "Average K/D Ratio: "
-  },
-
-  "currentWinStreak": {
-    "message": "Current Win Streak: "
-  },
-
-  "matches": {
-    "message": "Matches: "
-  },
-
-  "wins": {
-    "message": "Wins: "
-  },
-
-  "winRate": {
-    "message": "Win Rate: "
-  },
-
-  "longestWinStreak": {
-    "message": "Longest Win Streak: "
-  },
-
-  "statsByMap": {
-    "message": "Stats by map"
-  }
 }

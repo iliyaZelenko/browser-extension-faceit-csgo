@@ -122,15 +122,6 @@ const config = {
     ]
 }
 
-// Add shell plugin only for production and single builds
-if (process.env.NODE_ENV === 'production' || !process.env.HMR) {
-    config.plugins.push(
-        new WebpackShellPlugin({
-            onBuildEnd: ['node scripts/remove-evals.js']
-        })
-    )
-}
-
 if (process.env.NODE_ENV === 'production') {
     config.plugins = (config.plugins || []).concat([
         new webpack.DefinePlugin({
@@ -152,6 +143,15 @@ if (process.env.HMR === 'true') {
             }
         })
     ])
+}
+
+// Add shell plugin only for production and single builds
+if (process.env.NODE_ENV === 'production' || !process.env.HMR) {
+    config.plugins.push(
+        new WebpackShellPlugin({
+            onBuildEnd: ['node scripts/remove-evals.js']
+        })
+    )
 }
 
 function transformHtml(content) {

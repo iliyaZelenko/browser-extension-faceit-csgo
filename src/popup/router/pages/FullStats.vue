@@ -1,66 +1,88 @@
 <template>
-  <div v-if="fullStats">
-    <div id="stats-wrap">
-      <div>
-        {{ $browser.i18n.getMessage('averageHeadshots') }}
-        <b class="value">{{ lifetime['Average Headshots %'] }} %</b>.
-      </div>
-      <div>
-        {{ $browser.i18n.getMessage('averageKDRatio') }}
-        <b class="value">{{ lifetime['Average K/D Ratio'] }}</b>.
-      </div>
-      <div>
-        {{ $browser.i18n.getMessage('currentWinStreak') }}
-        <b class="value">{{ lifetime['Current Win Streak'] }}</b>.
-      </div>
-      <div>
-        {{ $browser.i18n.getMessage('matches') }}
-        <b class="value">{{ lifetime['Matches'] }}</b>.
-      </div>
-      <div>
-        {{ $browser.i18n.getMessage('wins') }}
-        <b class="value">{{ lifetime['Wins'] }}</b>.
-      </div>
-      <div>
-        {{ $browser.i18n.getMessage('winRate') }}
-        <b class="value">{{ lifetime['Win Rate %'] }} %</b>.
-      </div>
-      <div>
-        {{ $browser.i18n.getMessage('longestWinStreak') }}
-        <b class="value">{{ lifetime['Longest Win Streak'] }}</b>.
+  <div v-if="fullStats" class="full-stats-wrapper">
+    <!-- Background with player avatar -->
+    <div
+      id="background"
+      :style="{
+        'background-image': backgroundImage
+      }"
+    />
+
+    <div class="overall-stats">
+      <h2>{{ $browser.i18n.getMessage('overallStatistics') || 'Общая статистика' }}</h2>
+      <div class="stats-table">
+        <div class="stat-row">
+          <span class="stat-with-icon">
+            <i class="fas fa-bullseye"></i>
+            {{ $browser.i18n.getMessage('averageHeadshots') }}
+          </span>
+          <span class="value">{{ lifetime['Average Headshots %'] }}%</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-with-icon">
+            <i class="fas fa-crosshairs"></i>
+            {{ $browser.i18n.getMessage('averageKDRatio') }}
+          </span>
+          <span class="value">{{ lifetime['Average K/D Ratio'] }}</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-with-icon">
+            <i class="fas fa-fire"></i>
+            {{ $browser.i18n.getMessage('currentWinStreak') }}
+          </span>
+          <span class="value">{{ lifetime['Current Win Streak'] }}</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-with-icon">
+            <i class="fas fa-calendar-alt"></i>
+            {{ $browser.i18n.getMessage('matches') }}
+          </span>
+          <span class="value">{{ lifetime['Matches'] }}</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-with-icon">
+            <i class="fas fa-trophy"></i>
+            {{ $browser.i18n.getMessage('wins') }}
+          </span>
+          <span class="value">{{ lifetime['Wins'] }}</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-with-icon">
+            <i class="fas fa-percentage"></i>
+            {{ $browser.i18n.getMessage('winRate') }}
+          </span>
+          <span class="value">{{ lifetime['Win Rate %'] }}%</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-with-icon">
+            <i class="fas fa-crown"></i>
+            {{ $browser.i18n.getMessage('longestWinStreak') }}
+          </span>
+          <span class="value">{{ lifetime['Longest Win Streak'] }}</span>
+        </div>
       </div>
     </div>
 
-    <h3 style="margin: 10px; text-align: center;">
-      {{ $browser.i18n.getMessage('statsByMap') }}
-    </h3>
-
-    <div id="maps-wrap">
-      <div
-        v-for="map of maps"
-        :key="map.label"
-      >
-        <small>
-          {{ map.label }}
-        </small>
-        <span
-          class="value"
-          style="font-size: 0.5rem;"
-        >
-          {{ map.stats['Win Rate %'] }} %
-        </span>
-
-        <img
-          :src="map.img_small"
-          :alt="map.label"
-        >
-      </div>
-    </div>
+    <MapSelector
+      :maps="maps"
+      :full-stats="fullStats"
+    />
   </div>
 </template>
 
 <script>
+import MapSelector from './components/MapSelector.vue'
+
 export default {
+  components: {
+    MapSelector
+  },
   props: {
     player: {
       type: Object,
@@ -72,9 +94,22 @@ export default {
     }
   },
   data () {
-    return {}
+    return {
+      defaultAvatar: 'https://cdn-frontend.faceit.com/web/54-1542827848/static/media/avatar_default_user_300x300.8befe042.jpg'
+    }
   },
   computed: {
+    backgroundImage() {
+      const avatar =
+        (
+          this.player &&
+          this.player.avatar
+        )
+          ? this.avatarOrDefault(this.player.avatar)
+          : this.defaultAvatar
+
+      return `url(${avatar})`
+    },
     lifetime () {
       return this.fullStats.lifetime
     },
@@ -83,47 +118,96 @@ export default {
     }
   },
   methods: {
-    //
+    avatarOrDefault(avatar) {
+      if (!avatar || avatar === 'https://d50m6q67g4bn3.cloudfront.net/avatars/084a317c-6346-4dde-ab85-744f469fc217_1464715706995') {
+        return this.defaultAvatar
+      }
+
+      return avatar
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-  #stats-wrap {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
+.full-stats-wrapper {
+  position: relative;
+  min-height: 100vh;
+  padding: 20px;
+}
 
-    padding-left: 10px;
+#background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  -webkit-filter: grayscale(100%) blur(2px);
+  filter: grayscale(100%) blur(2px);
+  background: no-repeat center;
+  background-size: cover;
+  z-index: -1;
+}
 
-    & div {
-      width: 100%;
-    }
+.overall-stats {
+  margin-bottom: 30px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(245, 85, 0, 0.3);
+  
+  h2 {
+    text-align: center;
+    margin: 0 0 20px 0;
+    color: #f50;
+    font-size: 1.8rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
   }
+}
 
-  #maps-wrap {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
+.stats-table {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 8px;
+}
 
-    & div {
-      width: 32%;
-      text-align: center;
-      transition: outline 0.2s;
-
-      &:hover {
-        outline: 1px solid #4e9af1;
-      }
-
-      & img {
-        width: 90%;
-        border-radius: 5px;
-        border: 1px solid white;
-      }
-    }
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  
+  &:last-child {
+    border-bottom: none;
   }
+}
+
+.stat-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  i {
+    color: #f50;
+    font-size: 1rem;
+    min-width: 18px;
+    text-align: center;
+  }
+}
+
+.value {
+  color: #f50;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+// Отступ для MapSelector
+:deep(.map-selector) {
+  margin-top: 30px;
+}
 </style>
 
 <!--

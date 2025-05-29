@@ -1,115 +1,131 @@
 {
-  "extensionName": {
-    "message": "Faceit elo статистика",
-    "description": "Name of the extension."
-  },
+    "extensionName": {
+        "message": "Faceit elo статистика",
+        "description": "Name of the extension."
+    },
 
-  "extensionDescription": {
-    "message": "Search for a player by nickname, extended statistics on elo and other player statistics.",
-    "description": "Description of the extension."
-  },
+    "extensionDescription": {
+        "message": "Search for a player by nickname, extended statistics on elo and other player statistics.",
+        "description": "Description of the extension."
+    },
 
-  "goToProfile": {
-    "message": "Открыть профиль",
-    "description": ""
-  },
+    "goToProfile": {
+        "message": "Открыть профиль",
+        "description": ""
+    },
 
-  "searchPlayerNoPlayeyFoundByRequest": {
-    "message": "Не найдено игрока по заросу.",
-    "description": ""
-  },
+    "searchPlayerNoPlayeyFoundByRequest": {
+        "message": "Не найдено игрока по заросу.",
+        "description": ""
+    },
 
-  "searchPlayerMinimalLettersInfo": {
-    "message": "Нам нужно как минимум $lettersCount$ символа для поиска.",
-    "placeholders": {
-      "lettersCount": {
-        "content": "$1"
-      }
+    "searchPlayerMinimalLettersInfo": {
+        "message": "Нам нужно как минимум $lettersCount$ символа для поиска.",
+        "placeholders": {
+            "lettersCount": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "showEloStats": {
+        "message": "Эло статистика"
+    },
+
+    "showFullStats": {
+        "message": "Вся статистика"
+    },
+
+    "level": {
+        "message": "Уровень: "
+    },
+
+    "eloRangeFor": {
+        "message": "Elo диапазон для $lvl$ уровня:",
+        "placeholders": {
+            "lvl": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "playerCanRaiseLvlIfHeGets": {
+        "message": "Игрок может поднять уровень если он получит "
+    },
+
+    "playerHas": {
+        "message": "Игрок имеет "
+    },
+
+    "maximalLvl": {
+        "message": "максимальный уровень"
+    },
+
+    "minimalLvl": {
+        "message": "минимальный уровень"
+    },
+
+    "playerMayLoseLvlIfHeLoses": {
+        "message": "Игрок потеряет lvl если потеряет"
+    },
+
+    "recentResults": {
+        "message": "Последние результаты: "
+    },
+
+    "showThisProfileAfterOpening": {
+        "message": "Показывать этот профиль"
+    },
+
+    "saved": {
+        "message": " (Сохранено)"
+    },
+
+    "averageHeadshots": {
+        "message": "Процент хедшотов: "
+    },
+
+    "averageKDRatio": {
+        "message": "Средний K/D соотношение: "
+    },
+
+    "currentWinStreak": {
+        "message": "Текущая победная серия: "
+    },
+
+    "matches": {
+        "message": "Матчи: "
+    },
+
+    "wins": {
+        "message": "Победы: "
+    },
+
+    "winRate": {
+        "message": "Шанс на победу: "
+    },
+
+    "longestWinStreak": {
+        "message": "Самая длинная победная серия: "
+    },
+
+    "statsByMap": {
+        "message": "Статистика по картам"
+    },
+
+    "mapDetailedStats": {
+        "message": "Детальная статистика"
+    },
+
+    "mapAdditionalStats": {
+        "message": "Дополнительная статистика"
+    },
+
+    "backToMapsList": {
+        "message": "Назад к списку карт"
+    },
+
+    "clickForDetailedStats": {
+        "message": "Нажмите для детальной статистики"
     }
-  },
-
-  "showEloStats": {
-    "message": "Эло статистика"
-  },
-
-  "showFullStats": {
-    "message": "Вся статистика"
-  },
-
-  "level": {
-    "message": "Уровень: "
-  },
-
-  "eloRangeFor": {
-    "message": "Elo диапазон для $lvl$ уровня:",
-    "placeholders": {
-      "lvl": {
-        "content": "$1"
-      }
-    }
-  },
-
-  "playerCanRaiseLvlIfHeGets": {
-    "message": "Игрок может поднять уровень если он получит "
-  },
-
-  "playerHas": {
-    "message": "Игрок имеет "
-  },
-
-  "maximalLvl": {
-    "message": "максимальный уровень"
-  },
-
-  "minimalLvl": {
-    "message": "минимальный уровень"
-  },
-
-  "playerMayLoseLvlIfHeLoses": {
-    "message": "Игрок потеряет lvl если потеряет"
-  },
-
-  "recentResults": {
-    "message": "Последние результаты: "
-  },
-
-  "showThisProfileAfterOpening": {
-    "message": "Показывать этот профиль"
-  },
-
-  "saved": {
-    "message": " (Сохранено)"
-  },
-
-  "averageHeadshots": {
-    "message": "Процент хедшотов: "
-  },
-
-  "averageKDRatio": {
-    "message": "Средний K/D соотношение: "
-  },
-
-  "currentWinStreak": {
-    "message": "Текущая победная серия: "
-  },
-
-  "matches": {
-    "message": "Матчи: "
-  },
-
-  "wins": {
-    "message": "Победы: "
-  },
-
-  "winRate": {
-    "message": "Шанс на победу: "
-  },
-
-  "longestWinStreak": {
-    "message": "Самая длинная победная серия: "
-  },
-
-  "statsByMap": {
-    "message": "Статистика по картам"
-  }
 }
