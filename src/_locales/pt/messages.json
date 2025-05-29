@@ -1,0 +1,216 @@
+{
+    "extensionName": {
+        "message": "Estatísticas Elo do Faceit",
+        "description": "Name of the extension."
+    },
+
+    "extensionDescription": {
+        "message": "Mostra uma notificação quando o usuário clica em links.",
+        "description": "Description of the extension."
+    },
+
+    "goToProfile": {
+        "message": "Abrir perfil",
+        "description": ""
+    },
+
+    "searchPlayerNoPlayeyFoundByRequest": {
+        "message": "Nenhum jogador encontrado.",
+        "description": ""
+    },
+
+    "searchPlayerMinimalLettersInfo": {
+        "message": "Precisamos de pelo menos $lettersCount$ letras para buscar.",
+        "description": "",
+        "placeholders": {
+            "lettersCount": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "showEloStats": {
+        "message": "Elo"
+    },
+
+    "showFullStats": {
+        "message": "Estatísticas"
+    },
+
+    "level": {
+        "message": "Nível: "
+    },
+
+    "eloRangeFor": {
+        "message": "Faixa de Elo para nível $lvl$:",
+        "placeholders": {
+            "lvl": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "playerCanRaiseLvlIfHeGets": {
+        "message": "O jogador pode subir de nível se conseguir "
+    },
+
+    "playerHas": {
+        "message": "O jogador tem "
+    },
+
+    "maximalLvl": {
+        "message": "nível máximo"
+    },
+
+    "minimalLvl": {
+        "message": "nível mínimo"
+    },
+
+    "playerMayLoseLvlIfHeLoses": {
+        "message": "O jogador pode perder nível se perder"
+    },
+
+    "recentResults": {
+        "message": "Resultados recentes: "
+    },
+
+    "showThisProfileAfterOpening": {
+        "message": "Mostrar este perfil após abrir"
+    },
+
+    "saved": {
+        "message": " (Salvo)"
+    },
+
+    "averageHeadshots": {
+        "message": "Headshots médios: "
+    },
+
+    "averageKDRatio": {
+        "message": "Proporção K/D média: "
+    },
+
+    "currentWinStreak": {
+        "message": "Sequência de vitórias atual: "
+    },
+
+    "matches": {
+        "message": "Partidas: "
+    },
+
+    "wins": {
+        "message": "Vitórias: "
+    },
+
+    "winRate": {
+        "message": "Taxa de vitórias: "
+    },
+
+    "longestWinStreak": {
+        "message": "Maior sequência de vitórias: "
+    },
+
+    "statsByMap": {
+        "message": "Estatísticas por mapa"
+    },
+
+    "mapDetailedStats": {
+        "message": "Estatísticas detalhadas"
+    },
+
+    "mapAdditionalStats": {
+        "message": "Estatísticas adicionais"
+    },
+
+    "backToMapsList": {
+        "message": "Voltar à lista de mapas"
+    },
+
+    "clickForDetailedStats": {
+        "message": "Clique para estatísticas detalhadas"
+    },
+
+    "elo": {
+        "message": "Elo:"
+    },
+
+    "playerSearchPlaceholder": {
+        "message": "Digite o nome do jogador"
+    },
+
+    "kdRatio": {
+        "message": "Proporção K/D"
+    },
+
+    "headshotsPercentage": {
+        "message": "Porcentagem de headshots"
+    },
+
+    "averageKills": {
+        "message": "Kills médios"
+    },
+
+    "averageDeaths": {
+        "message": "Mortes médias"
+    },
+
+    "averageAssists": {
+        "message": "Assistências médias"
+    },
+
+    "averageMvps": {
+        "message": "MVPs médios"
+    },
+
+    "totalKills": {
+        "message": "Total de kills:"
+    },
+
+    "totalDeaths": {
+        "message": "Total de mortes:"
+    },
+
+    "totalAssists": {
+        "message": "Total de assistências:"
+    },
+
+    "headshotsPerMatch": {
+        "message": "Headshots por partida:"
+    },
+
+    "tripleKills": {
+        "message": "Triple kills:"
+    },
+
+    "quadroKills": {
+        "message": "Quadra kills:"
+    },
+
+    "pentaKills": {
+        "message": "Penta kills:"
+    },
+
+    "totalRounds": {
+        "message": "Total de rounds:"
+    },
+
+    "statsNotLoaded": {
+        "message": "Dados de estatísticas não carregados."
+    },
+
+    "back": {
+        "message": "Voltar"
+    },
+
+    "map": {
+        "message": "Mapa"
+    },
+
+    "mapNotFound": {
+        "message": "não encontrado nas estatísticas."
+    },
+
+    "loadingMapStats": {
+        "message": "Carregando estatísticas do mapa..."
+    }
+}
