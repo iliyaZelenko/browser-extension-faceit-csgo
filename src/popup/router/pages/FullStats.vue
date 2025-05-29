@@ -9,7 +9,7 @@
     />
 
     <div class="overall-stats">
-      <h2>{{ $browser.i18n.getMessage('overallStatistics') || 'Общая статистика' }}</h2>
+      <h2>{{ $browser.i18n.getMessage('overallStatistics') }}</h2>
       <div class="stats-table">
         <div class="stat-row">
           <span class="stat-with-icon">
@@ -74,14 +74,19 @@
       :full-stats="fullStats"
     />
   </div>
+  
+  <!-- Empty State когда игрок не выбран -->
+  <EmptyState v-else />
 </template>
 
 <script>
 import MapSelector from './components/MapSelector.vue'
+import EmptyState from './components/EmptyState.vue'
 
 export default {
   components: {
-    MapSelector
+    MapSelector,
+    EmptyState
   },
   props: {
     player: {

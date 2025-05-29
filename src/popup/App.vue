@@ -1,11 +1,17 @@
 <template>
   <div>
     <router-view />
+    <SupportButton />
   </div>
 </template>
 
 <script>
+import SupportButton from './router/pages/components/SupportButton.vue'
+
 export default {
+  components: {
+    SupportButton
+  },
   data () {
     return {}
   }

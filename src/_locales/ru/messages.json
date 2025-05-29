@@ -211,5 +211,21 @@
 
     "loadingMapStats": {
         "message": "Загрузка статистики карты..."
+    },
+
+    "noPlayerSelected": {
+        "message": "Игрок не выбран"
+    },
+
+    "searchPlayerHint": {
+        "message": "Найдите игрока выше, чтобы посмотреть его статистику FaceIt"
+    },
+
+    "startSearching": {
+        "message": "Начните с ввода никнейма игрока в поле поиска"
+    },
+
+    "overallStatistics": {
+        "message": "Общая статистика"
     }
 }

@@ -212,5 +212,21 @@
 
     "loadingMapStats": {
         "message": "Ładowanie statystyk mapy..."
+    },
+
+    "noPlayerSelected": {
+        "message": "Nie wybrano gracza"
+    },
+
+    "searchPlayerHint": {
+        "message": "Wyszukaj gracza powyżej, aby zobaczyć jego statystyki FaceIt"
+    },
+
+    "startSearching": {
+        "message": "Zacznij od wpisania nicku gracza w pole wyszukiwania"
+    },
+
+    "overallStatistics": {
+        "message": "Statystyki ogólne"
     }
 }

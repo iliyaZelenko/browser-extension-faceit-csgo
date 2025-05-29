@@ -117,10 +117,18 @@
       </button>
     </div>
   </div>
+  
+  <!-- Empty State когда игрок не выбран -->
+  <EmptyState v-else />
 </template>
 
 <script>
+import EmptyState from './components/EmptyState.vue'
+
 export default {
+  components: {
+    EmptyState
+  },
   props: {
     player: {
       type: Object,

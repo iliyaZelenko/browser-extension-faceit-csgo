@@ -212,5 +212,21 @@
 
     "loadingMapStats": {
         "message": "Lade Kartenstatistiken..."
+    },
+
+    "noPlayerSelected": {
+        "message": "Kein Spieler ausgewählt"
+    },
+
+    "searchPlayerHint": {
+        "message": "Suchen Sie oben nach einem Spieler, um seine FaceIt-Statistiken anzuzeigen"
+    },
+
+    "startSearching": {
+        "message": "Beginnen Sie mit der Eingabe eines Spielernamens in das Suchfeld"
+    },
+
+    "overallStatistics": {
+        "message": "Gesamtstatistiken"
     }
 }

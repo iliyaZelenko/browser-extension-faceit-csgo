@@ -212,5 +212,21 @@
 
     "loadingMapStats": {
         "message": "Loading map statistics..."
+    },
+
+    "noPlayerSelected": {
+        "message": "No player selected"
+    },
+
+    "searchPlayerHint": {
+        "message": "Search for a player above to view their FaceIt statistics"
+    },
+
+    "startSearching": {
+        "message": "Start by typing a player's nickname in the search field"
+    },
+
+    "overallStatistics": {
+        "message": "Overall Statistics"
     }
 }
