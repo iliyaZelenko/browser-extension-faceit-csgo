@@ -7,6 +7,8 @@
       }"
     />
 
+    <div style="width: 100%; height: 60px; background: red;"></div>
+
     <div style="padding: 8px;">
       <div style="display: flex; justify-content: center;">
         <!--

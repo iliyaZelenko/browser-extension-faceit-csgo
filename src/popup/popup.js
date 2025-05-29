@@ -5,22 +5,22 @@ import router from './router'
 import VueAxios from 'vue-plugin-axios'
 import axios from 'axios'
 import VueSelect from 'vue-cool-select'
+import browser from 'webextension-polyfill'
 
-global.browser = require('webextension-polyfill')
-Vue.prototype.$browser = global.browser
+Vue.prototype.$browser = browser
 
 Vue.use(VueAxios, {
-  axios
+    axios
 })
 
 Vue.use(VueSelect, {
-  theme: 'bootstrap' // or 'material-design'
+    theme: 'bootstrap' // or 'material-design'
 })
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
-  store,
-  router,
-  render: h => h(App)
+    el: '#app',
+    store,
+    router,
+    render: h => h(App)
 })
