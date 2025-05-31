@@ -1,5 +1,8 @@
 <template>
-  <div v-if="fullStats" class="full-stats-wrapper">
+  <div
+    v-if="fullStats"
+    class="full-stats-wrapper"
+  >
     <!-- Background with player avatar -->
     <div
       id="background"
@@ -13,7 +16,7 @@
       <div class="stats-table">
         <div class="stat-row">
           <span class="stat-with-icon">
-            <i class="fas fa-bullseye"></i>
+            <i class="fas fa-bullseye" />
             {{ $browser.i18n.getMessage('averageHeadshots') }}
           </span>
           <span class="value">{{ lifetime['Average Headshots %'] }}%</span>
@@ -21,7 +24,7 @@
 
         <div class="stat-row">
           <span class="stat-with-icon">
-            <i class="fas fa-crosshairs"></i>
+            <i class="fas fa-crosshairs" />
             {{ $browser.i18n.getMessage('averageKDRatio') }}
           </span>
           <span class="value">{{ lifetime['Average K/D Ratio'] }}</span>
@@ -29,7 +32,7 @@
 
         <div class="stat-row">
           <span class="stat-with-icon">
-            <i class="fas fa-fire"></i>
+            <i class="fas fa-fire" />
             {{ $browser.i18n.getMessage('currentWinStreak') }}
           </span>
           <span class="value">{{ lifetime['Current Win Streak'] }}</span>
@@ -37,7 +40,7 @@
 
         <div class="stat-row">
           <span class="stat-with-icon">
-            <i class="fas fa-calendar-alt"></i>
+            <i class="fas fa-calendar-alt" />
             {{ $browser.i18n.getMessage('matches') }}
           </span>
           <span class="value">{{ lifetime['Matches'] }}</span>
@@ -45,7 +48,7 @@
 
         <div class="stat-row">
           <span class="stat-with-icon">
-            <i class="fas fa-trophy"></i>
+            <i class="fas fa-trophy" />
             {{ $browser.i18n.getMessage('wins') }}
           </span>
           <span class="value">{{ lifetime['Wins'] }}</span>
@@ -53,7 +56,7 @@
 
         <div class="stat-row">
           <span class="stat-with-icon">
-            <i class="fas fa-percentage"></i>
+            <i class="fas fa-percentage" />
             {{ $browser.i18n.getMessage('winRate') }}
           </span>
           <span class="value">{{ lifetime['Win Rate %'] }}%</span>
@@ -61,7 +64,7 @@
 
         <div class="stat-row">
           <span class="stat-with-icon">
-            <i class="fas fa-crown"></i>
+            <i class="fas fa-crown" />
             {{ $browser.i18n.getMessage('longestWinStreak') }}
           </span>
           <span class="value">{{ lifetime['Longest Win Streak'] }}</span>
@@ -74,7 +77,7 @@
       :full-stats="fullStats"
     />
   </div>
-  
+
   <!-- Empty State когда игрок не выбран -->
   <EmptyState v-else />
 </template>
@@ -104,7 +107,7 @@ export default {
     }
   },
   computed: {
-    backgroundImage() {
+    backgroundImage () {
       const avatar =
         (
           this.player &&
@@ -123,7 +126,7 @@ export default {
     }
   },
   methods: {
-    avatarOrDefault(avatar) {
+    avatarOrDefault (avatar) {
       if (!avatar || avatar === 'https://d50m6q67g4bn3.cloudfront.net/avatars/084a317c-6346-4dde-ab85-744f469fc217_1464715706995') {
         return this.defaultAvatar
       }
@@ -159,7 +162,7 @@ export default {
   padding: 20px;
   border-radius: 8px;
   border: 1px solid rgba(245, 85, 0, 0.3);
-  
+
   h2 {
     text-align: center;
     margin: 0 0 20px 0;
@@ -183,7 +186,7 @@ export default {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -193,7 +196,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  
+
   i {
     color: #f50;
     font-size: 1rem;

@@ -1,6 +1,9 @@
 <template>
-  <div class="support-button" @click="openTelegram">
-    <i class="fas fa-headset"></i>
+  <div
+    class="support-button"
+    @click="openTelegram"
+  >
+    <i class="fas fa-headset" />
   </div>
 </template>
 
@@ -8,7 +11,7 @@
 export default {
   name: 'SupportButton',
   methods: {
-    openTelegram() {
+    openTelegram () {
       this.$browser.tabs.create({
         url: 'https://t.me/+kywMwGjayds3Nzc6'
       })
@@ -29,16 +32,16 @@ export default {
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 136, 204, 0.3);
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(0, 136, 204, 0.5);
   }
-  
+
   &:active {
     transform: scale(0.95);
   }
-  
+
   i {
     color: white;
     font-size: 16px;
@@ -60,4 +63,4 @@ export default {
     transform: translateY(0);
   }
 }
-</style> 
+</style>

@@ -1,10 +1,10 @@
 <template>
-  <button 
+  <button
     class="favorites-list-btn"
-    @click="goToFavorites"
     :title="$browser.i18n.getMessage('favoriteButton')"
+    @click="goToFavorites"
   >
-    <i class="fas fa-star"></i>
+    <i class="fas fa-star" />
   </button>
 </template>
 
@@ -12,7 +12,7 @@
 export default {
   name: 'FavoritesListButton',
   methods: {
-    goToFavorites() {
+    goToFavorites () {
       this.$router.push({ name: 'favorites' })
     }
   }
@@ -34,7 +34,7 @@ export default {
   justify-content: center;
   min-width: 40px;
   height: 40px;
-  
+
   &:hover {
     background: rgba(245, 85, 0, 0.1);
     border-color: #f50;
@@ -42,11 +42,11 @@ export default {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(245, 85, 0, 0.3);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
-  
+
   i {
     font-size: 1.1rem;
     animation: pulse 2s infinite;
@@ -64,4 +64,4 @@ export default {
     transform: scale(1);
   }
 }
-</style> 
+</style>

@@ -1,24 +1,36 @@
 <template>
-  <div v-if="player" class="elo-stats-wrapper">
-    <div style="text-align: center; margin-bottom: 10px;">
-      <a
-        href="#"
-        @click="openProfile"
-      >
-        {{ $browser.i18n.getMessage('goToProfile') }}
+  <div
+    v-if="player"
+    class="elo-stats-wrapper"
+  >
+    <div class="player-header">
+      <!-- Кнопка избранного слева -->
+      <div class="favorite-container">
+        <FavoriteButton
+          :player="player"
+        />
+      </div>
 
-        <b>{{ nickname }}</b>
-      </a>
-      <img
-        :src="`https://flagsapi.com/${player.country.toUpperCase()}/flat/16.png`"
-        alt="flag"
-        style="vertical-align: middle;"
-      >
-      
-      <!-- Кнопка избранного -->
-      <FavoriteButton 
-        :player="player"
-      />
+      <!-- Ссылка на профиль по центру -->
+      <div class="profile-link-container">
+        <a
+          href="#"
+          @click="openProfile"
+        >
+          {{ $browser.i18n.getMessage('goToProfile') }}
+
+          <b>{{ nickname }}</b>
+
+          <img
+            :src="`https://flagsapi.com/${player.country.toUpperCase()}/flat/16.png`"
+            alt="flag"
+            class="country-flag"
+          >
+        </a>
+      </div>
+
+      <!-- Пустой блок справа для баланса -->
+      <div class="right-spacer" />
     </div>
     <!--
     <img
@@ -41,15 +53,14 @@
 
     <div
       v-if="csgoStats && csgoStats.skill_level && fullStats"
-      style="padding: 0 5px;"
+      class="stats-container"
     >
-      <p style="display: flex; align-items: center;">
+      <p class="level-info">
         {{ $browser.i18n.getMessage('level') }}
-        <!--<b class="value">{{ csgoStats.skill_level }}</b>.-->
         <img
           :src="$browser.runtime.getURL(`assets/skill_level_${csgoStats.skill_level}_svg.svg`)"
           alt="lvl icon"
-          style="width: 32px; margin-left: 6px;"
+          class="level-icon"
         >
       </p>
       <p>
@@ -69,8 +80,8 @@
           class="progress"
         >
           <span
-            class="value"
-            :style="`width: ${Math.floor(csgoStats.faceit_elo / currentLvlNextLvlStart * 100)}%;`"
+            class="progress-value"
+            :style="`width: ${progressPercentage}%;`"
           />
         </div>
       </template>
@@ -105,48 +116,50 @@
       </div>
        -->
       <!-- W/L кружки для последних матчей -->
-      <div v-if="recentMatches.length > 0" class="recent-wl-circles">
-        <div 
-          v-for="(match, index) in recentMatches" 
-          :key="match.match_id"
-          :class="['wl-circle', getMatchResult(match)]"
-          :title="getMatchResultText(match)"
-          @click="goToSpecificMatch(index)"
-        >
-          {{ getMatchResultLetter(match) }}
+      <div v-if="lastMatches.length > 0">
+        <h4 class="recent-matches-title">{{ $browser.i18n.getMessage('recentResults') || 'Recent Matches' }}</h4>
+        <div class="recent-wl-circles">
+          <div
+            v-for="(match, index) in lastMatches"
+            :key="match.match_id"
+            :class="['wl-circle', getMatchResult(match)]"
+            :title="getMatchTooltip(match)"
+            @click="goToSpecificMatch(index)"
+          >
+            {{ getMatchResultLetter(match) }}
+          </div>
         </div>
       </div>
     </div>
 
-    <div style="text-align: center; margin-top: 10px;">
+    <div class="save-profile-section">
       <label class="save-profile-checkbox">
-        <input 
-          type="checkbox" 
+        <input
+          type="checkbox"
           :checked="localStorageNickname === nickname"
           @change="toggleSaveProfile"
         >
-        <span class="checkmark"></span>
+        <span class="checkmark" />
         <span class="checkbox-label">
           {{ $browser.i18n.getMessage('showThisProfileAfterOpening') }}
         </span>
       </label>
     </div>
   </div>
-  
+
   <!-- Empty State когда игрок не выбран -->
   <EmptyState v-else />
 </template>
 
 <script>
 import EmptyState from './components/EmptyState.vue'
-import RecentResults from './components/RecentResults.vue'
 import FavoriteButton from './components/FavoriteButton.vue'
-import { FACEIT_API, GAMES, API_LIMITS } from '../../utils/constants.js'
+import { faceitApi } from '../../services/faceitApi.js'
+import { getMatchResult, getMatchResultClass } from '../../utils/matchUtils.js'
 
 export default {
   components: {
     EmptyState,
-    RecentResults,
     FavoriteButton
   },
   props: {
@@ -177,7 +190,6 @@ export default {
     return {
       maxElo,
       matches: [],
-      loadingMatches: false,
       lvls: [
         { range: [1, 800], label: '1' },
         { range: [801, 950], label: '2' },
@@ -195,6 +207,9 @@ export default {
   computed: {
     progressLabel () {
       return `${this.csgoStats.faceit_elo} / ${this.currentLvlNextLvlStart} (${Math.floor(this.csgoStats.faceit_elo / this.currentLvlNextLvlStart * 100)} %)`
+    },
+    progressPercentage () {
+      return Math.floor(this.csgoStats.faceit_elo / this.currentLvlNextLvlStart * 100)
     },
     profileUrl () {
       return this.player.faceit_url.replace(/{lang}/, 'en')
@@ -226,25 +241,33 @@ export default {
     currentLvlNextLvlStart () {
       return this.lvls[this.currentLvlIndex + 1].range[0]
     },
-    recentMatches() {
+    lastMatches () {
       return this.matches.slice(0, 5)
     }
   },
   watch: {
     player: {
-      handler(newPlayer, oldPlayer) {
+      handler (newPlayer, oldPlayer) {
+        // eslint-disable-next-line camelcase
         if (newPlayer?.player_id && newPlayer.player_id !== oldPlayer?.player_id) {
-          this.loadMatches()
+          this.loadLastMatches()
         }
       },
       immediate: true
     },
     selectedGame: {
-      handler(newGame, oldGame) {
+      handler (newGame, oldGame) {
+        // eslint-disable-next-line camelcase
         if (newGame !== oldGame && this.player?.player_id) {
-          this.loadMatches()
+          this.loadLastMatches()
         }
       }
+    }
+  },
+  async created () {
+    // eslint-disable-next-line camelcase
+    if (this.player?.player_id) {
+      await this.loadLastMatches()
     }
   },
   methods: {
@@ -266,60 +289,130 @@ export default {
     toggleSaveProfile () {
       this.$emit('set-local-storage-nickname', this.localStorageNickname === this.nickname ? null : this.nickname)
     },
-    goToSpecificMatch(matchIndex) {
-      this.$router.push({ 
-        name: 'match-history', 
-        query: { highlight: matchIndex } 
+    goToSpecificMatch (matchIndex) {
+      // Переходим на страницу истории матчей с подсветкой конкретного матча
+      this.$router.push({
+        name: 'match-history',
+        query: { highlight: matchIndex }
       })
     },
-    async loadMatches() {
-      this.loadingMatches = true
+    async loadLastMatches () {
       try {
-        const response = await fetch(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/history?game=${this.selectedGame}&offset=0&limit=5`, {
-          headers: FACEIT_API.HEADERS
-        })
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        
-        const data = await response.json()
-        this.matches = data.items || []
+        // eslint-disable-next-line camelcase
+        const { items } = await faceitApi.getRecentMatches(this.player.player_id, this.selectedGame)
+        this.matches = items || []
       } catch (error) {
-        console.error('Error loading matches:', error)
+        console.error('Error loading last matches:', error)
         this.matches = []
-      } finally {
-        this.loadingMatches = false
       }
     },
-    getMatchResult(match) {
-      const playerTeam = this.findPlayerTeam(match)
-      if (playerTeam && match.results && match.results.winner) {
-        return match.results.winner === playerTeam.factionId ? 'win' : 'loss'
-      }
-      return 'unknown'
+    getMatchResult (match) {
+      // eslint-disable-next-line camelcase
+      return getMatchResult(match, this.player.player_id)
     },
-    getMatchResultText(match) {
+    getMatchResultClass (match) {
+      // eslint-disable-next-line camelcase
+      return getMatchResultClass(match, this.player.player_id)
+    },
+    getMatchResultText (match) {
       const result = this.getMatchResult(match)
-      if (result === 'win') return this.$browser.i18n.getMessage('win') || 'Win'
-      if (result === 'loss') return this.$browser.i18n.getMessage('loss') || 'Loss'
+      if (result === 'win') return this.$browser.i18n.getMessage('win')
+      if (result === 'loss') return this.$browser.i18n.getMessage('loss')
       return 'N/A'
     },
-    getMatchResultLetter(match) {
+    getMatchResultLetter (match) {
       const result = this.getMatchResult(match)
       if (result === 'win') return 'W'
       if (result === 'loss') return 'L'
       return 'N/A'
     },
-    findPlayerTeam(match) {
-      if (!match.teams) return null
-      
-      for (const [factionId, team] of Object.entries(match.teams)) {
-        if (team.players && team.players.some(player => player.player_id === this.player.player_id)) {
-          return { factionId: factionId, ...team }
+    formatCreatedAt (createdAt) {
+      const date = new Date(createdAt * 1000)
+      return date.toLocaleDateString()
+    },
+    formatElo (elo) {
+      if (!elo || elo === 'undefined') return 'N/A'
+      return elo
+    },
+    getSkinColorByElo (elo) {
+      if (!elo || elo === 'undefined') return 'color: white;'
+      if (elo <= 800) return 'color: #5E5E5E;'
+      if (elo <= 950) return 'color: #69BD56;'
+      if (elo <= 1100) return 'color: #69BD56;'
+      if (elo <= 1250) return 'color: #FFC537;'
+      if (elo <= 1400) return 'color: #FFC537;'
+      if (elo <= 1550) return 'color: #FF9D2B;'
+      if (elo <= 1700) return 'color: #FF6309;'
+      if (elo <= 1850) return 'color: #FF6309;'
+      if (elo <= 2000) return 'color: #FF2828;'
+      return 'color: #FF2828;'
+    },
+    formatAvgKd (kd) {
+      if (!kd || kd === 'undefined') return 'N/A'
+      return parseFloat(kd).toFixed(2)
+    },
+    formatAvgHs (hs) {
+      if (!hs || hs === 'undefined') return 'N/A'
+      return Math.round(parseFloat(hs)) + '%'
+    },
+    formatWinRate (matches, wins) {
+      if (!matches || !wins || matches === 'undefined' || wins === 'undefined') return 'N/A'
+      return Math.round((parseInt(wins) / parseInt(matches)) * 100) + '%'
+    },
+    formatKdStyle (kd) {
+      if (!kd || kd === 'undefined') return 'color: white;'
+      const parsedKd = parseFloat(kd)
+      if (parsedKd >= 1.3) return 'color: #4CAF50;'
+      if (parsedKd >= 1.0) return 'color: #FFC107;'
+      return 'color: #F44336;'
+    },
+    formatHsStyle (hs) {
+      if (!hs || hs === 'undefined') return 'color: white;'
+      const parsedHs = parseFloat(hs)
+      if (parsedHs >= 50) return 'color: #4CAF50;'
+      if (parsedHs >= 40) return 'color: #FFC107;'
+      return 'color: #F44336;'
+    },
+    formatWinRateStyle (matches, wins) {
+      if (!matches || !wins || matches === 'undefined' || wins === 'undefined') return 'color: white;'
+      const winRate = (parseInt(wins) / parseInt(matches)) * 100
+      if (winRate >= 60) return 'color: #4CAF50;'
+      if (winRate >= 50) return 'color: #FFC107;'
+      return 'color: #F44336;'
+    },
+    getSkillLevelInfo (elo) {
+      if (!elo || elo === 'undefined') return null
+      const skillLevels = this.skillLevels
+      for (const level of skillLevels) {
+        if (elo >= level.range[0] && elo <= level.range[1]) {
+          return level
         }
       }
       return null
+    },
+    getMatchTooltip (match) {
+      const result = this.getMatchResult(match)
+      const resultText = result === 'win' ? 'Победа' : result === 'loss' ? 'Поражение' : 'N/A'
+      const date = new Date(match.created_at * 1000).toLocaleDateString()
+      
+      let tooltip = `${resultText} • ${date}`
+      
+      // Добавляем информацию о карте если доступна
+      if (match.voting && match.voting.map && match.voting.map.pick && match.voting.map.pick[0]) {
+        tooltip += ` • ${match.voting.map.pick[0]}`
+      }
+      
+      // Добавляем счет если доступен
+      if (match.results && match.results.score) {
+        const scores = Object.values(match.results.score)
+        if (scores.length === 2) {
+          tooltip += ` • ${scores[0]}:${scores[1]}`
+        }
+      }
+      
+      tooltip += ' • Клик для просмотра в истории матчей'
+      
+      return tooltip
     }
   }
 }
@@ -333,6 +426,57 @@ export default {
     border: 1px solid rgba(245, 85, 0, 0.3);
     color: white;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  .player-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    position: relative;
+  }
+
+  .favorite-container {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+  }
+
+  .profile-link-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .right-spacer {
+    flex: 0 0 auto;
+    width: 40px; /* Примерно ширина кнопки избранного для баланса */
+  }
+
+  .country-flag {
+    vertical-align: middle;
+  }
+
+  .stats-container {
+    padding: 0 5px;
+  }
+
+  .level-info {
+    display: flex;
+    align-items: center;
+  }
+
+  .level-icon {
+    width: 32px;
+    margin-left: 6px;
+  }
+
+  .save-profile-section {
+    text-align: center;
+    margin-top: 10px;
   }
 
   .value {
@@ -370,7 +514,7 @@ export default {
     left: 0;
     right: 0;
   }
-  .progress .value {
+  .progress .progress-value {
     background-color: #7cc4ff;
     display: inline-block;
     height: 100%;
@@ -475,7 +619,7 @@ export default {
     color: white;
     border-color: #f44336;
   }
-  
+
   .wl-circle.unknown {
     background: linear-gradient(135deg, #666, #555);
     color: white;
@@ -483,8 +627,22 @@ export default {
   }
 
   .wl-circle:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: scale(1.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+    position: relative;
+  }
+
+  .wl-circle:active {
+    transform: scale(1.05);
+  }
+
+  .recent-matches-title {
+    text-align: center;
+    margin: 15px 0 10px 0;
+    color: #f50;
+    font-size: 1.1rem;
+    font-weight: 600;
   }
 </style>
 

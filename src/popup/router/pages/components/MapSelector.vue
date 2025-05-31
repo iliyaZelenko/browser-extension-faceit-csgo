@@ -25,7 +25,7 @@
           :alt="map.label"
           class="map-image"
         >
-        
+
         <div class="map-overlay">
           <div class="overlay-content">
             <span class="click-hint">{{ $browser.i18n.getMessage('clickForDetailedStats') }}</span>
@@ -48,9 +48,9 @@ export default {
       required: true
     }
   },
-  
+
   methods: {
-    selectMap(map) {
+    selectMap (map) {
       // Переход на страницу детальной статистики карты
       this.$router.push({
         name: 'map-stats',
@@ -94,15 +94,15 @@ export default {
   border-radius: 8px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.2);
-  
+
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(245, 85, 0, 0.3);
-    
+
     .map-overlay {
       opacity: 1;
     }
-    
+
     .map-image {
       transform: scale(1.1);
     }
@@ -173,4 +173,4 @@ export default {
     width: 100%;
   }
 }
-</style> 
+</style>

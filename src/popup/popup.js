@@ -10,17 +10,17 @@ import browser from 'webextension-polyfill'
 Vue.prototype.$browser = browser
 
 Vue.use(VueAxios, {
-    axios
+  axios
 })
 
 Vue.use(VueSelect, {
-    theme: 'bootstrap' // or 'material-design'
+  theme: 'bootstrap' // or 'material-design'
 })
 
 /* eslint-disable no-new */
 new Vue({
-    el: '#app',
-    store,
-    router,
-    render: h => h(App)
+  el: '#app',
+  store,
+  router,
+  render: h => h(App)
 })

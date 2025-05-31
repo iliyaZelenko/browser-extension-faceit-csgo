@@ -3,11 +3,14 @@
     <!-- Recent Results Summary -->
     <div class="results-summary">
       <h3>{{ $browser.i18n.getMessage('recentResults') }}</h3>
-      
+
       <!-- W/L кружки для последних матчей -->
-      <div v-if="recentMatches.length > 0" class="recent-wl-circles">
-        <div 
-          v-for="(match, index) in recentMatches" 
+      <div
+        v-if="recentMatches.length > 0"
+        class="recent-wl-circles"
+      >
+        <div
+          v-for="(match, index) in recentMatches"
           :key="match.match_id"
           :class="['wl-circle', getMatchResult(match)]"
           :title="getMatchResultText(match)"
@@ -21,15 +24,21 @@
     <!-- Match History List -->
     <div class="match-history">
       <h3>{{ $browser.i18n.getMessage('detailedMatchHistory') }}</h3>
-      
+
       <!-- Loading state -->
-      <div v-if="loadingMatches" class="loading-state">
-        <div class="spinner"></div>
+      <div
+        v-if="loadingMatches"
+        class="loading-state"
+      >
+        <div class="spinner" />
         <p>{{ $browser.i18n.getMessage('loadingMatches') }}</p>
       </div>
 
       <!-- Matches list -->
-      <div v-else-if="matches.length > 0" class="matches-list">
+      <div
+        v-else-if="matches.length > 0"
+        class="matches-list"
+      >
         <MatchCard
           v-for="(match, index) in matches"
           :key="match.match_id"
@@ -41,24 +50,30 @@
       </div>
 
       <!-- Empty state -->
-      <div v-else class="empty-matches">
+      <div
+        v-else
+        class="empty-matches"
+      >
         <p>{{ $browser.i18n.getMessage('noMatchesFound') }}</p>
       </div>
     </div>
 
     <!-- Load more button -->
-    <div v-if="matches.length > 0 && !loadingMatches" class="load-more-section">
-      <button 
-        @click="loadMoreMatches"
+    <div
+      v-if="matches.length > 0 && !loadingMatches"
+      class="load-more-section"
+    >
+      <button
         :disabled="loadingMore"
         class="load-more-btn"
+        @click="loadMoreMatches"
       >
         <span v-if="loadingMore">{{ $browser.i18n.getMessage('loading') }}...</span>
         <span v-else>{{ $browser.i18n.getMessage('loadMoreMatches') }}</span>
       </button>
     </div>
   </div>
-  
+
   <!-- Empty State когда игрок не выбран -->
   <EmptyState v-else />
 </template>
@@ -67,7 +82,8 @@
 import RecentResults from './components/RecentResults.vue'
 import MatchCard from './components/MatchCard.vue'
 import EmptyState from './components/EmptyState.vue'
-import { FACEIT_API, GAMES, API_LIMITS } from '../../utils/constants.js'
+import { faceitApi } from '../../services/faceitApi.js'
+import { getMatchResult, getMatchResultLetter, findPlayerTeam } from '../../utils/matchUtils.js'
 
 export default {
   components: {
@@ -93,157 +109,167 @@ export default {
       default: 'csgo'
     }
   },
-  data() {
+  data () {
     return {
       matches: [],
       loadingMatches: false,
       loadingMore: false,
       offset: 0,
-      limit: API_LIMITS.MATCHES_PER_PAGE,
-      highlightedMatchIndex: null
+      limit: 20,
+      highlightedMatchIndex: null,
+      isLoading: false,
+      currentPage: 0,
+      hasMore: true
     }
   },
   computed: {
-    recentResults() {
+    recentResults () {
       return this.fullStats?.lifetime?.['Recent Results'] || []
     },
-    recentMatches() {
+    recentMatches () {
       return this.matches.slice(0, 5)
     }
   },
   watch: {
-    selectedGame: {
-      handler(newGame, oldGame) {
-        if (newGame !== oldGame && this.player?.player_id) {
-          this.offset = 0 // Сбрасываем offset при смене игры
-          this.loadMatches()
-        }
+    'player.player_id': async function (newPlayerId) {
+      if (newPlayerId) {
+        this.resetAndLoad()
+      }
+    },
+    selectedGame: async function () {
+      if (this.player?.player_id) {
+        this.resetAndLoad()
+      }
+    },
+    '$route.query.highlight': function () {
+      // Применяем подсветку при изменении query параметра
+      if (this.matches.length > 0) {
+        this.handleHighlightFromQuery()
       }
     }
   },
-  async mounted() {
+  async created () {
     if (this.player?.player_id) {
       await this.loadMatches()
-      
-      // Проверяем есть ли параметр для подсветки матча
-      if (this.$route.query.highlight !== undefined) {
-        const highlightIndex = parseInt(this.$route.query.highlight)
-        
-        if (!isNaN(highlightIndex) && highlightIndex >= 0 && highlightIndex < this.matches.length) {
-          this.highlightedMatchIndex = highlightIndex
-          
-          // Убираем подсветку через 3 секунды
-          setTimeout(() => {
-            this.highlightedMatchIndex = null
-          }, 3000)
-          
-          // Прокручиваем к выделенному матчу
-          this.$nextTick(() => {
-            const matchCards = document.querySelectorAll('.match-card')
-            if (matchCards[highlightIndex]) {
-              matchCards[highlightIndex].scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'center' 
-              })
-            }
-          })
-        }
-      }
+      this.handleHighlightFromQuery()
+    }
+  },
+  async mounted () {
+    if (this.player?.player_id) {
+      await this.loadMatches()
+      // Подсветка теперь вызывается после загрузки матчей
+      this.handleHighlightFromQuery()
     }
   },
   methods: {
-    async loadMatches() {
-      this.loadingMatches = true
+    async loadMatches () {
+      if (this.isLoading || !this.hasMore || !this.player?.player_id) return
+
+      this.isLoading = true
+
       try {
-        const response = await fetch(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/history?game=${this.selectedGame}&offset=${this.offset}&limit=${this.limit}`, {
-          headers: FACEIT_API.HEADERS
-        })
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        const { items } = await faceitApi.getPlayerMatches(
+          this.player.player_id,
+          this.selectedGame,
+          this.currentPage * 20,
+          20
+        )
+
+        if (items && items.length > 0) {
+          this.matches.push(...items)
+          this.currentPage++
+
+          if (items.length < 20) {
+            this.hasMore = false
+          }
+        } else {
+          this.hasMore = false
         }
-        
-        const data = await response.json()
-        this.matches = data.items || []
       } catch (error) {
         console.error('Error loading matches:', error)
-        this.matches = []
-      } finally {
-        this.loadingMatches = false
+        this.hasMore = false
       }
+
+      this.isLoading = false
     },
-    async loadMoreMatches() {
-      this.loadingMore = true
-      this.offset += this.limit
-      try {
-        const response = await fetch(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/history?game=${this.selectedGame}&offset=${this.offset}&limit=${this.limit}`, {
-          headers: FACEIT_API.HEADERS
-        })
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        
-        const data = await response.json()
-        const moreMatches = data.items || []
-        this.matches.push(...moreMatches)
-      } catch (error) {
-        console.error('Error loading more matches:', error)
-        // Если ошибка загрузки, просто не добавляем новые матчи
-      } finally {
-        this.loadingMore = false
-      }
+    async resetAndLoad () {
+      this.matches = []
+      this.currentPage = 0
+      this.hasMore = true
+      await this.loadMatches()
+      // Применяем подсветку после загрузки новых матчей
+      this.handleHighlightFromQuery()
     },
-    clearHighlight() {
-      this.highlightedMatchIndex = null
+    getMatchResult (match) {
+      return getMatchResult(match, this.player.player_id)
     },
-    getMatchResult(match) {
-      const playerTeam = this.findPlayerTeam(match)
-      if (playerTeam && match.results && match.results.winner) {
-        return match.results.winner === playerTeam.factionId ? 'win' : 'loss'
-      }
-      return 'unknown'
-    },
-    getMatchResultText(match) {
+    getMatchResultText (match) {
       const result = this.getMatchResult(match)
       if (result === 'win') return this.$browser.i18n.getMessage('win') || 'Win'
       if (result === 'loss') return this.$browser.i18n.getMessage('loss') || 'Loss'
       return 'N/A'
     },
-    getMatchResultLetter(match) {
-      const result = this.getMatchResult(match)
-      if (result === 'win') return 'W'
-      if (result === 'loss') return 'L'
-      return 'N/A'
+    getMatchResultLetter (match) {
+      return getMatchResultLetter(match, this.player.player_id)
     },
-    goToSpecificMatch(index) {
+    goToSpecificMatch (index) {
       this.highlightedMatchIndex = index
-      
+
       // Убираем подсветку через 3 секунды
       setTimeout(() => {
         this.highlightedMatchIndex = null
       }, 3000)
-      
+
       // Прокручиваем к выделенному матчу
       this.$nextTick(() => {
         const matchCards = document.querySelectorAll('.match-card')
         if (matchCards[index]) {
-          matchCards[index].scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
+          matchCards[index].scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
           })
         }
       })
     },
-    findPlayerTeam(match) {
-      if (!match.teams) return null
-      
-      for (const [factionId, team] of Object.entries(match.teams)) {
-        if (team.players && team.players.some(player => player.player_id === this.player.player_id)) {
-          return { factionId: factionId, ...team }
+    findPlayerTeam (match) {
+      return findPlayerTeam(match, this.player.player_id)
+    },
+    clearHighlight () {
+      this.highlightedMatchIndex = null
+    },
+    async loadMoreMatches () {
+      await this.loadMatches()
+    },
+    handleHighlightFromQuery () {
+      // Проверяем есть ли параметр для подсветки матча
+      if (this.$route.query.highlight !== undefined) {
+        const highlightIndex = parseInt(this.$route.query.highlight)
+
+        if (!isNaN(highlightIndex) && highlightIndex >= 0 && highlightIndex < this.matches.length) {
+          this.highlightedMatchIndex = highlightIndex
+
+          // Убираем подсветку через 3 секунды
+          setTimeout(() => {
+            this.highlightedMatchIndex = null
+          }, 3000)
+
+          // Прокручиваем к выделенному матчу с дополнительной задержкой для рендеринга
+          this.$nextTick(() => {
+            setTimeout(() => {
+              const matchesContainer = document.querySelector('.matches-list')
+              if (matchesContainer) {
+                const matchCards = matchesContainer.children
+                if (matchCards[highlightIndex]) {
+                  matchCards[highlightIndex].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                  })
+                }
+              }
+            }, 100) // Небольшая задержка для гарантированного рендеринга
+          })
         }
       }
-      return null
     }
   }
 }
@@ -321,7 +347,7 @@ export default {
     color: white;
     border-color: #f44336;
   }
-  
+
   &.unknown {
     background: linear-gradient(135deg, #666, #555);
     color: white;
@@ -351,7 +377,7 @@ export default {
   text-align: center;
   padding: 40px 20px;
   color: #ccc;
-  
+
   .spinner {
     width: 40px;
     height: 40px;
@@ -393,15 +419,15 @@ export default {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(245, 85, 0, 0.3);
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
 }
-</style> 
+</style>

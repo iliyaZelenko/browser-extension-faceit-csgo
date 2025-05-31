@@ -6,25 +6,28 @@
           :src="avatarOrDefault(player.avatar)"
           :alt="player.nickname"
           class="avatar-img"
-        />
+        >
         <img
           v-if="player.country"
           :src="`https://flagsapi.com/${player.country.toUpperCase()}/flat/16.png`"
           alt="flag"
           class="country-flag"
-        />
+        >
       </div>
-      
+
       <div class="player-details">
         <div class="player-name">
           {{ player.nickname }}
         </div>
-        <div v-if="player.skill_level" class="player-level">
+        <div
+          v-if="player.skill_level"
+          class="player-level"
+        >
           <img
             :src="$browser.runtime.getURL(`assets/skill_level_${player.skill_level}_svg.svg`)"
             alt="level"
             class="level-icon"
-          />
+          >
           <span class="elo-text">{{ player.faceit_elo || '?' }} ELO</span>
         </div>
         <div class="added-date">
@@ -32,23 +35,23 @@
         </div>
       </div>
     </div>
-    
+
     <div class="player-actions">
-      <button 
-        @click="viewStats"
+      <button
         class="action-btn view-btn"
         :title="$browser.i18n.getMessage('viewPlayerStats')"
+        @click="viewStats"
       >
-        <i class="fas fa-chart-line"></i>
+        <i class="fas fa-chart-line" />
         <span>{{ $browser.i18n.getMessage('viewPlayerStats') }}</span>
       </button>
-      
-      <button 
-        @click="removeFromFavorites"
+
+      <button
         class="action-btn remove-btn"
         :title="$browser.i18n.getMessage('removeFromFavoritesList')"
+        @click="removeFromFavorites"
       >
-        <i class="fas fa-trash"></i>
+        <i class="fas fa-trash" />
       </button>
     </div>
   </div>
@@ -63,25 +66,25 @@ export default {
       required: true
     }
   },
-  data() {
+  data () {
     return {
       defaultAvatar: 'https://cdn-frontend.faceit.com/web/54-1542827848/static/media/avatar_default_user_300x300.8befe042.jpg'
     }
   },
   methods: {
-    avatarOrDefault(avatar) {
+    avatarOrDefault (avatar) {
       if (!avatar || avatar === 'https://d50m6q67g4bn3.cloudfront.net/avatars/084a317c-6346-4dde-ab85-744f469fc217_1464715706995') {
         return this.defaultAvatar
       }
       return avatar
     },
-    
-    formatAddedDate(timestamp) {
+
+    formatAddedDate (timestamp) {
       const date = new Date(timestamp)
       const now = new Date()
       const diffInMinutes = Math.floor((now - date) / (1000 * 60))
       const diffInHours = Math.floor((now - date) / (1000 * 60 * 60))
-      
+
       if (diffInMinutes < 1) {
         return this.$browser.i18n.getMessage('justNow')
       } else if (diffInMinutes < 60) {
@@ -99,12 +102,12 @@ export default {
         }
       }
     },
-    
-    viewStats() {
+
+    viewStats () {
       this.$emit('view-stats', this.player.nickname)
     },
-    
-    removeFromFavorites() {
+
+    removeFromFavorites () {
       this.$emit('remove-favorite', this.player.player_id)
     }
   }
@@ -119,7 +122,7 @@ export default {
   padding: 16px;
   margin-bottom: 12px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     border-color: rgba(245, 85, 0, 0.6);
     transform: translateY(-2px);
@@ -136,14 +139,14 @@ export default {
 .player-avatar {
   position: relative;
   margin-right: 12px;
-  
+
   .avatar-img {
     width: 48px;
     height: 48px;
     border-radius: 50%;
     border: 2px solid rgba(245, 85, 0, 0.3);
   }
-  
+
   .country-flag {
     position: absolute;
     bottom: -2px;
@@ -158,32 +161,32 @@ export default {
 .player-details {
   flex: 1;
   color: white;
-  
+
   .player-name {
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 4px;
     color: #f50;
   }
-  
+
   .player-level {
     display: flex;
     align-items: center;
     gap: 6px;
     margin-bottom: 4px;
-    
+
     .level-icon {
       width: 24px;
       height: 24px;
     }
-    
+
     .elo-text {
       font-size: 0.9rem;
       font-weight: 500;
       color: rgba(255, 255, 255, 0.8);
     }
   }
-  
+
   .added-date {
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.6);
@@ -208,38 +211,38 @@ export default {
   display: flex;
   align-items: center;
   gap: 6px;
-  
+
   &:hover {
     transform: translateY(-1px);
   }
-  
+
   &.view-btn {
     background: rgba(245, 85, 0, 0.2);
     border-color: rgba(245, 85, 0, 0.4);
     color: #f50;
     flex: 1;
-    
+
     &:hover {
       background: rgba(245, 85, 0, 0.3);
       border-color: #f50;
       color: white;
     }
   }
-  
+
   &.remove-btn {
     background: rgba(244, 67, 54, 0.2);
     border-color: rgba(244, 67, 54, 0.4);
     color: #f44336;
     min-width: 40px;
     justify-content: center;
-    
+
     &:hover {
       background: rgba(244, 67, 54, 0.3);
       border-color: #f44336;
       color: white;
     }
   }
-  
+
   i {
     font-size: 0.9rem;
   }
@@ -260,4 +263,4 @@ export default {
     transform: translateY(0);
   }
 }
-</style> 
+</style>

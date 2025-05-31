@@ -2,19 +2,19 @@
   <div class="empty-state">
     <div class="empty-content">
       <div class="empty-icon">
-        <i class="fas fa-search"></i>
+        <i class="fas fa-search" />
       </div>
-      
+
       <h3 class="empty-title">
         {{ $browser.i18n.getMessage('noPlayerSelected') }}
       </h3>
-      
+
       <p class="empty-description">
         {{ $browser.i18n.getMessage('searchPlayerHint') }}
       </p>
-      
+
       <div class="empty-hint">
-        <i class="fas fa-info-circle"></i>
+        <i class="fas fa-info-circle" />
         {{ $browser.i18n.getMessage('startSearching') }}
       </div>
     </div>
@@ -52,7 +52,7 @@ export default {
   background: linear-gradient(135deg, #ff5500, #ff7733);
   border-radius: 50%;
   box-shadow: 0 8px 25px rgba(255, 85, 0, 0.3);
-  
+
   i {
     font-size: 32px;
     color: white;
@@ -85,7 +85,7 @@ export default {
   padding: 12px 16px;
   border-radius: 8px;
   border: 1px solid rgba(255, 85, 0, 0.1);
-  
+
   i {
     color: #ff5500;
     font-size: 14px;
@@ -114,23 +114,23 @@ export default {
     padding: 20px 10px;
     min-height: 250px;
   }
-  
+
   .empty-icon {
     width: 60px;
     height: 60px;
     margin-bottom: 15px;
-    
+
     i {
       font-size: 24px;
     }
   }
-  
+
   .empty-title {
     font-size: 1.3rem;
   }
-  
+
   .empty-description {
     font-size: 0.9rem;
   }
 }
-</style> 
+</style>

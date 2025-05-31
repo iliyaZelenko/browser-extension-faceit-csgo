@@ -1,13 +1,16 @@
 <template>
   <div class="animated-tabs-container">
-    <div class="tabs-wrapper" ref="tabsWrapper">
+    <div
+      ref="tabsWrapper"
+      class="tabs-wrapper"
+    >
       <!-- Анимированный индикатор активной табы -->
-      <div 
-        class="active-tab-indicator" 
-        :style="indicatorStyle"
+      <div
         ref="indicator"
+        class="active-tab-indicator"
+        :style="indicatorStyle"
       />
-      
+
       <!-- Табы -->
       <router-link
         v-for="(tab, index) in tabs"
@@ -15,15 +18,18 @@
         :to="tab.to"
         class="tab-link"
         :class="{ 'active': isActiveTab(tab), 'first-tab': index === 0, 'second-tab': index === 1 }"
-        @click="updateIndicator"
         exact
+        @click="updateIndicator"
       >
-        <i :class="tab.icon"></i>
+        <i :class="tab.icon" />
       </router-link>
     </div>
-    
+
     <!-- Отладочная информация (только в dev) -->
-    <div v-if="showDebug" class="debug-info">
+    <div
+      v-if="showDebug"
+      class="debug-info"
+    >
       <p>Active route: {{ $route.name }}</p>
       <p>Active tab index: {{ activeTabIndex }}</p>
       <p>Tabs: {{ JSON.stringify(tabs) }}</p>
@@ -41,8 +47,8 @@ export default {
       required: true
     }
   },
-  
-  data() {
+
+  data () {
     return {
       indicatorStyle: {
         width: '0px',
@@ -52,23 +58,23 @@ export default {
       showDebug: false // Включите true для отладки
     }
   },
-  
+
   computed: {
-    activeTabIndex() {
+    activeTabIndex () {
       const index = this.tabs.findIndex(tab => this.isActiveTab(tab))
       console.log('Active tab index:', index, 'Route:', this.$route.name)
       return index
     }
   },
-  
-  mounted() {
+
+  mounted () {
     console.log('AnimatedTabs mounted, tabs:', this.tabs)
     this.$nextTick(() => {
       setTimeout(() => {
         this.updateIndicatorPosition()
       }, 200)
     })
-    
+
     // Обновляем позицию при изменении маршрута
     this.$watch('$route', () => {
       console.log('Route changed to:', this.$route.name)
@@ -79,54 +85,54 @@ export default {
       })
     })
   },
-  
+
   methods: {
-    isActiveTab(tab) {
+    isActiveTab (tab) {
       const isActive = this.$route.name === tab.name
       console.log(`Checking tab ${tab.name} vs route ${this.$route.name}: ${isActive}`)
       return isActive
     },
-    
-    updateIndicator() {
+
+    updateIndicator () {
       this.$nextTick(() => {
         setTimeout(() => {
           this.updateIndicatorPosition()
         }, 50)
       })
     },
-    
-    updateIndicatorPosition() {
+
+    updateIndicatorPosition () {
       const activeIndex = this.activeTabIndex
       console.log('Updating indicator position for index:', activeIndex)
-      
+
       if (activeIndex === -1) {
         console.log('No active tab found')
         return
       }
-      
+
       const tabsWrapper = this.$refs.tabsWrapper
       if (!tabsWrapper) {
         console.log('No tabs wrapper found')
         return
       }
-      
+
       const tabLinks = tabsWrapper.querySelectorAll('.tab-link')
       const activeTabElement = tabLinks[activeIndex]
-      
+
       if (activeTabElement) {
         const wrapperRect = tabsWrapper.getBoundingClientRect()
         const tabRect = activeTabElement.getBoundingClientRect()
-        
+
         // Вычисляем относительную позицию с учетом padding
         const left = tabRect.left - wrapperRect.left
         const width = tabRect.width
-        
+
         this.indicatorStyle = {
           width: `${width}px`,
           left: `${left}px`,
           opacity: 1
         }
-        
+
         console.log('Updated indicator:', this.indicatorStyle)
       } else {
         console.log('Could not find active tab element')
@@ -163,12 +169,12 @@ export default {
   background: linear-gradient(135deg, #f50, #ff6b35);
   border-radius: 6px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
+  box-shadow:
     0 2px 8px rgba(245, 85, 0, 0.4),
     0 0 20px rgba(245, 85, 0, 0.2);
   z-index: 1;
   pointer-events: none;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -201,17 +207,17 @@ export default {
   cursor: pointer;
   border: 2px solid transparent;
   min-width: 44px;
-  
+
   &:hover {
     color: white !important;
     transform: translateY(-1px);
     border-color: rgba(245, 85, 0, 0.3);
-    
+
     &:not(.active) {
       background: rgba(245, 85, 0, 0.15);
     }
   }
-  
+
   // Очень заметный стиль для активной табы
   &.active {
     color: white !important;
@@ -219,7 +225,7 @@ export default {
     background: rgba(245, 85, 0, 0.5) !important;
     border-color: #f50 !important;
     font-weight: 700;
-    
+
     // Дополнительная индикация снизу
     &::after {
       content: '';
@@ -233,25 +239,25 @@ export default {
       box-shadow: 0 0 8px rgba(245, 85, 0, 0.8);
     }
   }
-  
+
   // Специальные стили для первой и второй табы для отладки
   &.first-tab.active {
     background: rgba(245, 85, 0, 0.7) !important;
   }
-  
+
   &.second-tab.active {
     background: rgba(255, 107, 53, 0.7) !important;
   }
-  
+
   i {
     font-size: 1.1rem;
     transition: transform 0.3s ease;
   }
-  
+
   &:hover i {
     transform: scale(1.1);
   }
-  
+
   &.active i {
     transform: scale(1.1);
     filter: drop-shadow(0 0 4px rgba(245, 85, 0, 0.8));
@@ -267,10 +273,10 @@ export default {
   color: #ccc;
   border: 1px solid rgba(245, 85, 0, 0.3);
   max-width: 300px;
-  
+
   p {
     margin: 4px 0;
     word-break: break-all;
   }
 }
-</style> 
+</style>

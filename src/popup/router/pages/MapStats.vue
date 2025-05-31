@@ -35,15 +35,15 @@
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-icon">
-              <i class="fas fa-crosshairs"></i>
+              <i class="fas fa-crosshairs" />
             </div>
             <div class="stat-title">{{ $browser.i18n.getMessage('kdRatio') }}</div>
             <div class="stat-value-big">{{ mapData.stats['Average K/D Ratio'] }}</div>
           </div>
-          
+
           <div class="stat-card">
             <div class="stat-icon">
-              <i class="fas fa-bullseye"></i>
+              <i class="fas fa-bullseye" />
             </div>
             <div class="stat-title">{{ $browser.i18n.getMessage('headshotsPercentage') }}</div>
             <div class="stat-value-big">{{ mapData.stats['Average Headshots %'] }}%</div>
@@ -51,7 +51,7 @@
 
           <div class="stat-card">
             <div class="stat-icon">
-              <i class="fas fa-fire"></i>
+              <i class="fas fa-fire" />
             </div>
             <div class="stat-title">{{ $browser.i18n.getMessage('averageKills') }}</div>
             <div class="stat-value-big">{{ mapData.stats['Average Kills'] }}</div>
@@ -59,7 +59,7 @@
 
           <div class="stat-card">
             <div class="stat-icon">
-              <i class="fas fa-skull"></i>
+              <i class="fas fa-skull" />
             </div>
             <div class="stat-title">{{ $browser.i18n.getMessage('averageDeaths') }}</div>
             <div class="stat-value-big">{{ mapData.stats['Average Deaths'] }}</div>
@@ -67,7 +67,7 @@
 
           <div class="stat-card">
             <div class="stat-icon">
-              <i class="fas fa-handshake"></i>
+              <i class="fas fa-handshake" />
             </div>
             <div class="stat-title">{{ $browser.i18n.getMessage('averageAssists') }}</div>
             <div class="stat-value-big">{{ mapData.stats['Average Assists'] }}</div>
@@ -75,7 +75,7 @@
 
           <div class="stat-card">
             <div class="stat-icon">
-              <i class="fas fa-crown"></i>
+              <i class="fas fa-crown" />
             </div>
             <div class="stat-title">{{ $browser.i18n.getMessage('averageMvps') }}</div>
             <div class="stat-value-big">{{ mapData.stats['Average MVPs'] }}</div>
@@ -87,56 +87,56 @@
           <div class="additional-stats-grid">
             <div class="additional-stat">
               <span class="stat-with-icon">
-                <i class="fas fa-crosshairs"></i>
+                <i class="fas fa-crosshairs" />
                 {{ $browser.i18n.getMessage('totalKills') }}
               </span>
               <span class="value">{{ mapData.stats['Kills'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
-                <i class="fas fa-skull-crossbones"></i>
+                <i class="fas fa-skull-crossbones" />
                 {{ $browser.i18n.getMessage('totalDeaths') }}
               </span>
               <span class="value">{{ mapData.stats['Deaths'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
-                <i class="fas fa-hands-helping"></i>
+                <i class="fas fa-hands-helping" />
                 {{ $browser.i18n.getMessage('totalAssists') }}
               </span>
               <span class="value">{{ mapData.stats['Assists'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
-                <i class="fas fa-dot-circle"></i>
+                <i class="fas fa-dot-circle" />
                 {{ $browser.i18n.getMessage('headshotsPerMatch') }}
               </span>
               <span class="value">{{ mapData.stats['Headshots per Match'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
-                <i class="fas fa-medal"></i>
+                <i class="fas fa-medal" />
                 {{ $browser.i18n.getMessage('tripleKills') }}
               </span>
               <span class="value">{{ mapData.stats['Triple Kills'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
-                <i class="fas fa-trophy"></i>
+                <i class="fas fa-trophy" />
                 {{ $browser.i18n.getMessage('quadroKills') }}
               </span>
               <span class="value">{{ mapData.stats['Quadro Kills'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
-                <i class="fas fa-star"></i>
+                <i class="fas fa-star" />
                 {{ $browser.i18n.getMessage('pentaKills') }}
               </span>
               <span class="value">{{ mapData.stats['Penta Kills'] }}</span>
             </div>
             <div class="additional-stat">
               <span class="stat-with-icon">
-                <i class="fas fa-clock"></i>
+                <i class="fas fa-clock" />
                 {{ $browser.i18n.getMessage('totalRounds') }}
               </span>
               <span class="value">{{ mapData.stats['Rounds'] }}</span>
@@ -146,22 +146,34 @@
       </div>
 
       <div class="navigation">
-        <button @click="goBack" class="back-button">
+        <button
+          class="back-button"
+          @click="goBack"
+        >
           ← {{ $browser.i18n.getMessage('backToMapsList') }}
         </button>
       </div>
     </div>
-    
-    <div v-else class="loading">
+
+    <div
+      v-else
+      class="loading"
+    >
       <div v-if="!fullStats || !fullStats.segments">
         <p>{{ $browser.i18n.getMessage('statsNotLoaded') }}</p>
-        <button @click="goBack" class="back-button">
+        <button
+          class="back-button"
+          @click="goBack"
+        >
           ← {{ $browser.i18n.getMessage('back') }}
         </button>
       </div>
       <div v-else-if="$route.params.mapLabel && !mapData">
         <p>{{ $browser.i18n.getMessage('map') }} "{{ $route.params.mapLabel }}" {{ $browser.i18n.getMessage('mapNotFound') }}</p>
-        <button @click="goBack" class="back-button">
+        <button
+          class="back-button"
+          @click="goBack"
+        >
           ← {{ $browser.i18n.getMessage('backToMapsList') }}
         </button>
       </div>
@@ -180,40 +192,40 @@ export default {
       default: () => ({})
     }
   },
-  
-  data() {
+
+  data () {
     return {
       mapData: null
     }
   },
-  
-  created() {
-    this.loadMapData()
-  },
-  
+
   watch: {
-    '$route'() {
+    '$route' () {
       this.loadMapData()
     },
-    fullStats() {
+    fullStats () {
       this.loadMapData()
     }
   },
-  
+
+  created () {
+    this.loadMapData()
+  },
+
   methods: {
-    loadMapData() {
+    loadMapData () {
       const mapLabel = this.$route.params.mapLabel
-      
+
       if (this.fullStats && this.fullStats.segments && mapLabel) {
         this.mapData = this.fullStats.segments.find(
-          segment => segment.type === 'Map' && 
-                    segment.mode === '5v5' && 
+          segment => segment.type === 'Map' &&
+                    segment.mode === '5v5' &&
                     segment.label === mapLabel
         )
       }
     },
-    
-    goBack() {
+
+    goBack () {
       this.$router.go(-1)
     }
   }
@@ -268,19 +280,19 @@ export default {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 10px;
-  
+
   .stat-item {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 5px;
-    
+
     .stat-label {
       font-size: 0.8rem;
       color: #ccc;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
     }
-    
+
     .stat-value {
       font-size: 1.2rem;
       font-weight: bold;
@@ -292,7 +304,7 @@ export default {
 
 .detailed-stats {
   margin-bottom: 20px;
-  
+
   h3 {
     text-align: center;
     margin-bottom: 15px;
@@ -315,27 +327,27 @@ export default {
   text-align: center;
   border: 1px solid rgba(245, 85, 0, 0.3);
   transition: all 0.3s ease;
-  
+
   &:hover {
     border-color: #f50;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(245, 85, 0, 0.3);
   }
-  
+
   .stat-icon {
     font-size: 1.5rem;
     margin-bottom: 8px;
     color: #f50;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   }
-  
+
   .stat-title {
     font-size: 0.85rem;
     color: #ccc;
     margin-bottom: 8px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   }
-  
+
   .stat-value-big {
     font-size: 1.4rem;
     font-weight: bold;
@@ -349,7 +361,7 @@ export default {
   padding: 15px;
   border-radius: 8px;
   border: 1px solid rgba(245, 85, 0, 0.3);
-  
+
   h4 {
     margin-top: 0;
     margin-bottom: 15px;
@@ -372,16 +384,16 @@ export default {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   .stat-with-icon {
     display: flex;
     align-items: center;
     gap: 5px;
-    
+
     i {
       color: #f50;
       font-size: 0.9rem;
@@ -389,7 +401,7 @@ export default {
       text-align: center;
     }
   }
-  
+
   .value {
     color: #f50;
     font-weight: bold;
@@ -410,7 +422,7 @@ export default {
   cursor: pointer;
   transition: all 0.3s ease;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  
+
   &:hover {
     background: #f50;
     color: white;
@@ -432,4 +444,4 @@ export default {
     margin-bottom: 20px;
   }
 }
-</style> 
+</style>

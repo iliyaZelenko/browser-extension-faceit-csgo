@@ -25,20 +25,20 @@ export default {
     }
   },
   methods: {
-    resultClass(result) {
+    resultClass (result) {
       return +result ? 'win-result' : 'lose-result'
     },
-    resultText(result) {
+    resultText (result) {
       return +result ? 'W' : 'L'
     },
-    resultTooltip(result, index) {
+    resultTooltip (result, index) {
       const outcome = +result ? this.$browser.i18n.getMessage('win') : this.$browser.i18n.getMessage('loss')
-      const gamesAgo = index === 0 
+      const gamesAgo = index === 0
         ? this.$browser.i18n.getMessage('lastGame')
         : this.$browser.i18n.getMessage('gamesAgo', [index + 1])
       return `${outcome} - ${gamesAgo}`
     },
-    goToMatch(index) {
+    goToMatch (index) {
       this.$emit('go-to-match', index)
     }
   }
@@ -76,27 +76,27 @@ export default {
   cursor: pointer;
   transition: all 0.2s ease;
   border: 2px solid transparent;
-  
+
   &:hover {
     transform: scale(1.1);
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   }
-  
+
   &.win-result {
     background: linear-gradient(135deg, #4CAF50, #45a049);
     color: white;
     box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
-    
+
     &:hover {
       box-shadow: 0 4px 12px rgba(76, 175, 80, 0.5);
     }
   }
-  
+
   &.lose-result {
     background: linear-gradient(135deg, #f44336, #d32f2f);
     color: white;
     box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
-    
+
     &:hover {
       box-shadow: 0 4px 12px rgba(244, 67, 54, 0.5);
     }
@@ -110,4 +110,4 @@ export default {
     width: 100%;
   }
 }
-</style> 
+</style>

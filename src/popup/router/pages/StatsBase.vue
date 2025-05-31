@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 340px; min-height: 360px;">
+  <div class="stats-base">
     <div
       id="background"
       :style="{
@@ -7,82 +7,24 @@
       }"
     />
 
-    <div style="width: 100%; height: 60px; background: red;"></div>
+    <div class="red-stripe" />
 
-    <div style="padding: 8px;">
+    <div class="content">
       <!-- Хедер с элементами управления -->
-      <div class="header-controls">
-        <!-- Селектор игры -->
-        <GameSelector @game-selected="onGameSelected" />
-        
-        <!-- Кнопки справа -->
-        <div class="right-buttons">
-          <!-- Кнопка избранных игроков -->
-          <FavoritesListButton />
-          
-          <!-- Кнопка поддержки -->
-          <SupportButton />
-        </div>
-      </div>
+      <AppHeader @game-selected="onGameSelected" />
 
       <!-- Поле ввода игрока (скрывается на странице "Избранные игроки") -->
-      <div 
+      <PlayerSearch
         v-if="$route.name !== 'favorites'"
-        style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px;"
-      >
-        <cool-select
-          v-model="nickname"
-          :items="players"
-          :loading="loading"
-          item-text="nickname"
-          item-value="nickname"
-          :placeholder="$browser.i18n.getMessage('playerSearchPlaceholder')"
-          style="width: 100%;"
-          disable-filtering-by-search
-          @search="onSearch"
-          @select="findPlayer"
-          @click="nickname = null"
-        >
-          <template slot="no-data">
-            {{
-              noData
-                ? $browser.i18n.getMessage('searchPlayerNoPlayeyFoundByRequest')
-                : $browser.i18n.getMessage('searchPlayerMinimalLettersInfo', searchLettersLimit + '')
-            }}
-          </template>
-          <template
-            slot="item"
-            slot-scope="{ item: playerSearch }"
-          >
-            <div style="display: flex; align-items: center;">
-              <img
-                :src="avatarOrDefault(playerSearch.avatar)"
-                alt="avatar"
-                style="width: 48px;"
-              >
-
-              <span style="margin-left: 10px;">
-                {{ playerSearch.nickname }}
-                <img
-                  v-if="playerSearch.verified"
-                  :src="$browser.runtime.getURL(`assets/verified.png`)"
-                  alt="verified"
-                  style="width: 16px;"
-                >
-              </span>
-
-              <img
-                :src="$browser.runtime.getURL(`assets/skill_level_${getPlayerSearchLvl(playerSearch)}_svg.svg`)"
-                alt="lvl icon"
-                style="width: 32px; margin-left: auto;"
-              >
-            </div>
-          </template>
-        </cool-select>
-      </div>
+        ref="playerSearch"
+        :selected-game="selectedGame"
+        :initial-nickname="nickname"
+        @player-found="onPlayerFound"
+        @player-error="onProfileError"
+      />
 
       <!-- Табы (скрываются на странице "Избранные игроки") -->
-      <AnimatedTabs 
+      <AnimatedTabs
         v-if="player && $route.name !== 'favorites'"
         :tabs="tabs"
       />
@@ -103,20 +45,16 @@
 </template>
 
 <script>
-import { CoolSelect } from 'vue-cool-select'
 import AnimatedTabs from './components/AnimatedTabs.vue'
-import FavoritesListButton from './components/FavoritesListButton.vue'
-import GameSelector from './components/GameSelector.vue'
-import SupportButton from './components/SupportButton.vue'
-import { FACEIT_API, GAMES } from '../../utils/constants.js'
+import AppHeader from './components/AppHeader.vue'
+import PlayerSearch from './components/PlayerSearch.vue'
+import { GAMES } from '../../utils/constants.js'
 
 export default {
-  components: { 
-    CoolSelect, 
+  components: {
     AnimatedTabs,
-    FavoritesListButton,
-    GameSelector,
-    SupportButton
+    AppHeader,
+    PlayerSearch
   },
   data () {
     const storageNickname = localStorage.getItem('nickname')
@@ -125,14 +63,8 @@ export default {
 
     return {
       nickname: validNickname,
-      players: [],
       player: null,
       fullStats: null,
-      loading: false,
-      searchTimeoutId: null,
-      searchLettersLimit: 2,
-      noData: false,
-      API_HEADERS: FACEIT_API.HEADERS,
       defaultAvatar: 'https://cdn-frontend.faceit.com/web/54-1542827848/static/media/avatar_default_user_300x300.8befe042.jpg',
       localStorageNicknameData: validNickname,
       selectedGame: localStorage.getItem('selectedGame') || GAMES.CSGO
@@ -164,7 +96,7 @@ export default {
 
       return `url(${avatar})`
     },
-    tabs() {
+    tabs () {
       return [
         {
           name: 'index',
@@ -187,14 +119,16 @@ export default {
   async created () {
     // if nickname was saved
     if (this.nickname) {
-      await this.onSearch(this.nickname)
-      await this.findPlayer()
+      // Эмулируем поиск для сохраненного никнейма
+      this.$nextTick(() => {
+        this.$refs.playerSearch?.findPlayer({ nickname: this.nickname })
+      })
     }
-    
+
     // Слушаем событие поиска игрока из списка избранных
     this.$root.$on('search-player', this.searchPlayerFromFavorites)
   },
-  beforeDestroy() {
+  beforeDestroy () {
     // Убираем слушатель при уничтожении компонента
     this.$root.$off('search-player', this.searchPlayerFromFavorites)
   },
@@ -202,173 +136,65 @@ export default {
     setLocalStorageNickname (val) {
       this.localStorageNickname = val
     },
-    onGameSelected(game) {
+    onGameSelected (game) {
       const previousGame = this.selectedGame
       this.selectedGame = game
-      
+
       // Если игра изменилась и есть выбранный игрок, перезагружаем данные
       if (previousGame !== game && this.player) {
-        this.findPlayer()
+        this.$refs.playerSearch?.findPlayer()
       }
     },
-    async findPlayer ({ nickname = this.nickname } = {}) {
-      this.player = this.fullStats = null
-
+    onPlayerFound ({ player, fullStats, nickname }) {
+      this.player = player
+      this.fullStats = fullStats
       this.nickname = nickname
-
-      if (this.nickname.length < 3) {
-        this.$browser.notifications.create({
-          type: 'basic',
-          iconUrl: this.$browser.runtime.getURL('icons/page-48.png'),
-          title: 'Nickname must be at least 2 characters.',
-          message: ''
-        })
-
-        return
-      }
-
-      // parse url
-      if (this.nickname.includes('faceit.com')) {
-        this.nickname = this.nickname.match(/players\/(.*)/)[1]
-        // remove all after nickname
-        this.nickname = this.nickname.split('/')[0]
-      }
-
-      this.loading = true
-
-      try {
-        this.player = await this.$get(`${FACEIT_API.BASE_URL}/players?nickname=${this.nickname}&game=${this.selectedGame}`, {
-          headers: this.API_HEADERS
-        })
-      } catch (e) {
-        if (e.response.status === 404) {
-          this.$browser.notifications.create({
-            'type': 'basic',
-            'iconUrl': this.$browser.runtime.getURL('icons/icon_48.png'),
-            'title': 'Player not found.',
-            'message': `Nickname ${this.nickname} not found.`
-          })
-        }
-
-        console.log(e)
-
-        this.player = null
-      }
-
-      if (this.player) {
-        await this.$nextTick()
-      }
-
-      // gets all statistics
-      if (this.player) {
-        try {
-          this.fullStats = await this.$get(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/stats/${this.selectedGame}`, {
-            headers: this.API_HEADERS
-          })
-        } catch (e) {
-          if (e.response.status === 404) {
-            this.$browser.notifications.create({
-              'type': 'basic',
-              'iconUrl': this.$browser.runtime.getURL('icons/icon_48.png'),
-              'title': 'Error from server.',
-              'message': e.response.data.errors[0].message
-            })
-          }
-        }
-      }
-
-      // end loading
-      this.loading = false
-    },
-    onSearch (search) {
-      const playersLimit = 5
-
-      this.player = null
-      this.noData = false
-
-      if (search.length < this.searchLettersLimit) {
-        this.players = []
-        this.loading = false
-
-        return
-      }
-      this.loading = true
-
-      clearTimeout(this.searchTimeoutId)
-      this.searchTimeoutId = setTimeout(async () => {
-        try {
-          const { items } = await this.$get(`${FACEIT_API.BASE_URL}/search/players?nickname=${search}&game=${this.selectedGame}&offset=0&limit=` + playersLimit, {
-            headers: this.API_HEADERS
-          })
-
-          this.players = items
-
-          if (!this.players.length) this.noData = true
-        } catch (e) {
-          this.players = []
-          this.noData = true
-        }
-
-        this.loading = false
-      }, 500)
     },
     onProfileError () {
       this.player = null
-      // this.players = []
-    },
-    getPlayerSearchLvl (playerSearch) {
-      return playerSearch.games.find(i => i.name === this.selectedGame).skill_level
+      this.fullStats = null
     },
     avatarOrDefault (avatar) {
       if (!avatar || avatar === 'https://d50m6q67g4bn3.cloudfront.net/avatars/084a317c-6346-4dde-ab85-744f469fc217_1464715706995') {
         return this.defaultAvatar
       }
-
       return avatar
     },
-    async searchPlayerFromFavorites(nickname) {
-      // Устанавливаем никнейм
+    async searchPlayerFromFavorites (nickname) {
+      // Устанавливаем никнейм и выполняем поиск через компонент PlayerSearch
       this.nickname = nickname
-      
-      // Выполняем поиск
-      await this.onSearch(nickname)
-      await this.findPlayer()
-    },
+      this.$refs.playerSearch?.findPlayer({ nickname })
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-  #background {
-    position: absolute;
-    width: 100%;
-    height: 100vh;
+.stats-base {
+  width: 340px;
+  min-height: 360px;
+}
 
-    -webkit-filter: grayscale(100%) blur(2px);
-    filter: grayscale(100%) blur(2px);
+#background {
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  -webkit-filter: grayscale(100%) blur(2px);
+  filter: grayscale(100%) blur(2px);
+  background: no-repeat center;
+  background-size: cover;
+  z-index: -1;
+}
 
-    background: no-repeat center;
-    background-size: cover;
+.red-stripe {
+  width: 100%;
+  height: 60px;
+  background: red;
+}
 
-    z-index: -1;
-  }
-
-  .header-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 12px;
-    background: rgba(0, 0, 0, 0.8);
-    border-radius: 8px;
-    border: 1px solid rgba(245, 85, 0, 0.3);
-    margin-bottom: 10px;
-  }
-
-  .right-buttons {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+.content {
+  padding: 8px;
+}
 </style>
 
 <!--

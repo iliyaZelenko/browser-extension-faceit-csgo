@@ -1,20 +1,23 @@
 <template>
   <div class="favorites-page">
     <div class="favorites-header">
-      <button 
-        @click="goBack"
+      <button
         class="back-btn"
+        @click="goBack"
       >
-        <i class="fas fa-arrow-left"></i>
+        <i class="fas fa-arrow-left" />
         <!-- {{ $browser.i18n.getMessage('backToSearch') }} -->
       </button>
       <h2 class="page-title">
-        <i class="fas fa-star"></i>
+        <i class="fas fa-star" />
         {{ $browser.i18n.getMessage('favoritePlayers') }}
-      </h2> 
+      </h2>
     </div>
-    
-    <div v-if="favoritesList.length > 0" class="favorites-list">
+
+    <div
+      v-if="favoritesList.length > 0"
+      class="favorites-list"
+    >
       <FavoritePlayerCard
         v-for="player in favoritesList"
         :key="player.player_id"
@@ -23,26 +26,29 @@
         @remove-favorite="removeFromFavorites"
       />
     </div>
-    
-    <div v-else class="empty-favorites">
+
+    <div
+      v-else
+      class="empty-favorites"
+    >
       <div class="empty-content">
         <div class="empty-icon">
-          <i class="fas fa-star"></i>
+          <i class="fas fa-star" />
         </div>
-        
+
         <h3 class="empty-title">
           {{ $browser.i18n.getMessage('noFavoritePlayers') }}
         </h3>
-        
+
         <p class="empty-description">
           {{ $browser.i18n.getMessage('addFirstFavorite') }}
         </p>
-        
-        <button 
-          @click="goBack"
+
+        <button
           class="empty-action-btn"
+          @click="goBack"
         >
-          <i class="fas fa-search"></i>
+          <i class="fas fa-search" />
           {{ $browser.i18n.getMessage('backToSearch') }}
         </button>
       </div>
@@ -58,42 +64,42 @@ export default {
   components: {
     FavoritePlayerCard
   },
-  data() {
+  data () {
     return {
       favoritesList: []
     }
   },
-  mounted() {
+  mounted () {
     this.loadFavorites()
   },
   methods: {
-    loadFavorites() {
+    loadFavorites () {
       const stored = localStorage.getItem('favoritePlayers')
       this.favoritesList = stored ? JSON.parse(stored) : []
-      
+
       // Сортируем по дате добавления (новые сверху)
       this.favoritesList.sort((a, b) => (b.added_at || 0) - (a.added_at || 0))
     },
-    
-    saveFavorites() {
+
+    saveFavorites () {
       localStorage.setItem('favoritePlayers', JSON.stringify(this.favoritesList))
     },
-    
-    viewPlayerStats(nickname) {
+
+    viewPlayerStats (nickname) {
       // Переходим на главную страницу и инициируем поиск
       this.$router.push({ name: 'index' })
-      
+
       // Передаем никнейм родительскому компоненту для поиска
       this.$nextTick(() => {
         // Используем событие для передачи никнейма в StatsBase
         this.$root.$emit('search-player', nickname)
       })
     },
-    
-    removeFromFavorites(playerId) {
+
+    removeFromFavorites (playerId) {
       this.favoritesList = this.favoritesList.filter(player => player.player_id !== playerId)
       this.saveFavorites()
-      
+
       this.$browser.notifications.create({
         type: 'basic',
         iconUrl: this.$browser.runtime.getURL('icons/icon_48.png'),
@@ -101,8 +107,8 @@ export default {
         message: this.$browser.i18n.getMessage('favoritesRemoved')
       })
     },
-    
-    goBack() {
+
+    goBack () {
       this.$router.push({ name: 'index' })
     }
   }
@@ -136,7 +142,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  
+
   i {
     font-size: 1.2rem;
   }
@@ -154,7 +160,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 6px;
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.2);
     border-color: rgba(255, 255, 255, 0.5);
@@ -166,21 +172,21 @@ export default {
 .favorites-list {
   max-height: 320px;
   overflow-y: auto;
-  
+
   // Кастомный скроллбар
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 3px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: rgba(245, 85, 0, 0.6);
     border-radius: 3px;
-    
+
     &:hover {
       background: rgba(245, 85, 0, 0.8);
     }
@@ -209,7 +215,7 @@ export default {
   background: linear-gradient(135deg, #f50, #ff7733);
   border-radius: 50%;
   box-shadow: 0 8px 25px rgba(245, 85, 0, 0.3);
-  
+
   i {
     font-size: 32px;
     color: white;
@@ -245,13 +251,13 @@ export default {
   align-items: center;
   gap: 8px;
   margin: 0 auto;
-  
+
   &:hover {
     background: linear-gradient(135deg, #ff6b35, #f50);
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(245, 85, 0, 0.4);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -272,4 +278,4 @@ export default {
     transform: translateY(0);
   }
 }
-</style> 
+</style>
