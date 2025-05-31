@@ -26,7 +26,8 @@
     ],
     "host_permissions": [
         "https://open.faceit.com/",
-        "https://o4509418472013824.ingest.de.sentry.io/"
+        "https://o4509418472013824.ingest.de.sentry.io/",
+        "https://www.google-analytics.com/*"
     ],
     "commands": {
         "_execute_action": {

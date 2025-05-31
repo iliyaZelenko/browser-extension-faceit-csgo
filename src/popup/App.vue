@@ -17,6 +17,23 @@ export default {
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent
     })
+
+    // Отслеживаем запуск приложения в Google Analytics
+    this.$analytics.trackPageView('popup_opened')
+    this.$analytics.trackEvent('app_launch', {
+      timestamp: new Date().toISOString(),
+      browser: this.getBrowserInfo()
+    })
+  },
+  methods: {
+    getBrowserInfo() {
+      const userAgent = navigator.userAgent
+      if (userAgent.includes('Chrome')) return 'chrome'
+      if (userAgent.includes('Firefox')) return 'firefox'
+      if (userAgent.includes('Safari')) return 'safari'
+      if (userAgent.includes('Edge')) return 'edge'
+      return 'unknown'
+    }
   },
   errorCaptured (err, vm, info) {
     // Глобальный обработчик ошибок Vue компонентов
@@ -26,6 +43,9 @@ export default {
       errorInfo: info,
       route: this.$route?.name || 'unknown'
     })
+
+    // Отправляем ошибку в Google Analytics
+    this.$analytics.trackError(`Component Error: ${err.message}`, false)
 
     // Продолжаем всплытие ошибки
     return false
