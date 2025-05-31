@@ -7,7 +7,8 @@
       }"
     />
 
-    <div class="red-stripe" />
+    <!-- Рекламный баннер -->
+    <AdvertisementBanner />
 
     <div class="content">
       <!-- Хедер с элементами управления -->
@@ -53,12 +54,14 @@ import AnimatedTabs from './components/AnimatedTabs.vue'
 import AppHeader from './components/AppHeader.vue'
 import PlayerSearch from './components/PlayerSearch.vue'
 import { GAMES } from '../../utils/constants.js'
+import AdvertisementBanner from './components/AdvertisementBanner.vue'
 
 export default {
   components: {
     AnimatedTabs,
     AppHeader,
-    PlayerSearch
+    PlayerSearch,
+    AdvertisementBanner
   },
   data () {
     const storageNickname = localStorage.getItem('nickname')
@@ -250,7 +253,7 @@ export default {
 <style lang="scss" scoped>
 .stats-base {
   width: 340px;
-  min-height: 360px;
+  min-height: 420px;
 }
 
 #background {
@@ -262,12 +265,6 @@ export default {
   background: no-repeat center;
   background-size: cover;
   z-index: -1;
-}
-
-.red-stripe {
-  width: 100%;
-  height: 60px;
-  background: red;
 }
 
 .content {

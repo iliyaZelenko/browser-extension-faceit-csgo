@@ -11,7 +11,7 @@
       >
         <div
           v-for="(match, index) in recentMatches"
-          :key="`recent-${match.match_id}`"
+          :key="`recent-circle-${index}-${match.match_id}`"
           :class="['wl-circle', getMatchResult(match)]"
           :title="getMatchResultText(match)"
           @click="goToSpecificMatch(index)"
@@ -41,7 +41,7 @@
       >
         <MatchCard
           v-for="(match, index) in matches"
-          :key="`match-${match.match_id}`"
+          :key="`match-list-${index}-${match.match_id}`"
           :match="match"
           :player-id="player.player_id"
           :highlighted="highlightedMatchIndex === index"
@@ -148,7 +148,6 @@ export default {
       loadingMatches: false,
       loadingMore: false,
       offset: 0,
-      limit: 20,
       highlightedMatchIndex: null,
       currentPage: 0,
       hasMore: true
@@ -221,7 +220,15 @@ export default {
             page: this.currentPage
           })
         } else {
-          this.matches.push(...newMatches)
+          // Фильтруем дубликаты перед добавлением
+          const existingMatchIds = new Set(this.matches.map(m => m.match_id))
+          const uniqueNewMatches = newMatches.filter(match => !existingMatchIds.has(match.match_id))
+          
+          if (uniqueNewMatches.length > 0) {
+            this.matches.push(...uniqueNewMatches)
+            console.log(`Added ${uniqueNewMatches.length} unique matches out of ${newMatches.length} received`)
+          }
+          
           this.currentPage++
 
           // Отслеживаем успешную загрузку матчей

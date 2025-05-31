@@ -121,7 +121,7 @@
         <div class="recent-wl-circles">
           <div
             v-for="(match, index) in lastMatches"
-            :key="match.match_id"
+            :key="'elo-stats-last-match-' + match.match_id"
             :class="['wl-circle', getMatchResult(match)]"
             :title="getMatchTooltip(match)"
             @click="goToSpecificMatch(index)"

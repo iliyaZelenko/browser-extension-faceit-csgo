@@ -1,4 +1,9 @@
 import Vue from 'vue'
+import VueCompositionAPI from '@vue/composition-api'
+
+// Подключаем Composition API для Vue 2 СРАЗУ, до других импортов
+Vue.use(VueCompositionAPI)
+
 import App from './App'
 import store from '../store'
 import router from './router'

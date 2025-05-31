@@ -6,12 +6,22 @@
 
 <script>
 import { logCriticalError, logAppState } from './services/sentry.js'
+import remoteConfig from './services/remoteConfig.js'
 
 export default {
   data () {
     return {}
   },
-  created () {
+  async created () {
+    // Инициализируем Remote Config
+    try {
+      await remoteConfig.initialize()
+      await remoteConfig.fetchConfig()
+      console.log('🔧 Remote Config initialized in App')
+    } catch (error) {
+      console.error('❌ Failed to initialize Remote Config in App:', error)
+    }
+
     // Логируем запуск приложения
     logAppState('app_started', {
       timestamp: new Date().toISOString(),
