@@ -55,6 +55,7 @@
 <script>
 import { CoolSelect } from 'vue-cool-select'
 import { faceitApi } from '../../../services/faceitApi.js'
+import { logWarning, logUserAction, logCriticalError } from '../../../services/sentry.js'
 
 export default {
   name: 'PlayerSearch',
@@ -111,6 +112,11 @@ export default {
         this.nickname = this.nickname.match(/players\/(.*)/)[1]
         // remove all after nickname
         this.nickname = this.nickname.split('/')[0]
+        
+        logUserAction('parse_faceit_url', { 
+          originalInput: nickname,
+          parsedNickname: this.nickname 
+        })
       }
 
       this.loading = true
@@ -125,24 +131,56 @@ export default {
             fullStats = await faceitApi.getPlayerStats(player.player_id, this.selectedGame)
           } catch (e) {
             if (e.message.includes('404')) {
+              logWarning('Player stats not found', {
+                player_id: player.player_id,
+                nickname: this.nickname,
+                selectedGame: this.selectedGame
+              })
+              
               this.$browser.notifications.create({
                 'type': 'basic',
                 'iconUrl': this.$browser.runtime.getURL('icons/icon_48.png'),
                 'title': 'Error from server.',
                 'message': 'Player stats not found'
               })
+            } else {
+              // Неожиданная ошибка при загрузке статистики
+              logCriticalError(e, {
+                context: 'player_stats_loading',
+                player_id: player.player_id,
+                nickname: this.nickname,
+                selectedGame: this.selectedGame
+              })
             }
           }
         }
 
+        logUserAction('player_found_successfully', {
+          nickname: this.nickname,
+          player_id: player?.player_id,
+          hasStats: !!fullStats
+        })
+
         this.$emit('player-found', { player, fullStats, nickname: this.nickname })
       } catch (e) {
         if (e.message.includes('404')) {
+          logWarning('Player not found', {
+            nickname: this.nickname,
+            selectedGame: this.selectedGame
+          })
+          
           this.$browser.notifications.create({
             'type': 'basic',
             'iconUrl': this.$browser.runtime.getURL('icons/icon_48.png'),
             'title': 'Player not found.',
             'message': `Nickname ${this.nickname} not found.`
+          })
+        } else {
+          // Неожиданная ошибка при поиске игрока
+          logCriticalError(e, {
+            context: 'player_search',
+            nickname: this.nickname,
+            selectedGame: this.selectedGame
           })
         }
 
@@ -170,10 +208,24 @@ export default {
           const { items } = await faceitApi.searchPlayers(search, this.selectedGame, 5)
           this.players = items || []
 
-          if (!this.players.length) this.noData = true
+          if (!this.players.length) {
+            this.noData = true
+          }
+          
+          logUserAction('autocomplete_search_completed', {
+            search,
+            resultCount: this.players.length,
+            selectedGame: this.selectedGame
+          })
         } catch (e) {
           this.players = []
           this.noData = true
+          
+          logWarning('Autocomplete search failed', {
+            search,
+            selectedGame: this.selectedGame,
+            error: e.message
+          })
         }
 
         this.loading = false

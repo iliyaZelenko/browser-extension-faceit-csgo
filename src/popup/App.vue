@@ -5,9 +5,30 @@
 </template>
 
 <script>
+import { logCriticalError, logAppState } from './services/sentry.js'
+
 export default {
   data () {
     return {}
+  },
+  created () {
+    // Логируем запуск приложения
+    logAppState('app_started', {
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent
+    })
+  },
+  errorCaptured (err, vm, info) {
+    // Глобальный обработчик ошибок Vue компонентов
+    logCriticalError(err, {
+      context: 'vue_component_error',
+      component: vm.$options.name || 'Unknown',
+      errorInfo: info,
+      route: this.$route?.name || 'unknown'
+    })
+
+    // Продолжаем всплытие ошибки
+    return false
   }
 }
 </script>

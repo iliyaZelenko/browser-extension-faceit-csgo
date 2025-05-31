@@ -17,6 +17,8 @@
         "chokidar": "^3.3.1"
     },
     "dependencies": {
+        "@sentry/browser": "^7.0.0",
+        "@sentry/vue": "^7.0.0",
         "axios": "^0.18.0",
         "core-js": "^2.5.7",
         "regenerator-runtime": "^0.12.1",

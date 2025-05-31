@@ -21,10 +21,12 @@
     },
     "permissions": [
         "notifications",
-        "tabs"
+        "tabs",
+        "storage"
     ],
     "host_permissions": [
-        "https://open.faceit.com/"
+        "https://open.faceit.com/",
+        "https://o4509418472013824.ingest.de.sentry.io/"
     ],
     "commands": {
         "_execute_action": {

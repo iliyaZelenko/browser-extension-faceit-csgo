@@ -156,6 +156,7 @@ import EmptyState from './components/EmptyState.vue'
 import FavoriteButton from './components/FavoriteButton.vue'
 import { faceitApi } from '../../services/faceitApi.js'
 import { getMatchResult, getMatchResultClass } from '../../utils/matchUtils.js'
+import { logCriticalError, logWarning, logUserAction, setSentryUser, clearSentryUser } from '../../services/sentry.js'
 
 export default {
   components: {
@@ -223,11 +224,22 @@ export default {
       const range = this.lvls.find(i => i.range[0] <= elo && elo <= i.range[1] && i.label === this.csgoStats.skill_level.toString())
 
       if (!range) {
+        const errorMessage = `This player has a mismatch of elo points (${elo} elo) to his lvl (${this.csgoStats.skill_level} lvl).`
+        
+        // Логируем критическую ошибку в Sentry
+        logCriticalError(new Error('Invalid player profile: elo/level mismatch'), {
+          player_id: this.player.player_id,
+          nickname: this.nickname,
+          elo,
+          skill_level: this.csgoStats.skill_level,
+          selectedGame: this.selectedGame
+        })
+
         this.$browser.notifications.create({
           'type': 'basic',
           'iconUrl': this.$browser.runtime.getURL('icons/icon_48.png'),
           'title': 'Invalid profile.',
-          'message': `This player has a mismatch of elo points (${elo} elo) to his lvl (${this.csgoStats.skill_level} lvl).`
+          'message': errorMessage
         })
 
         this.$emit('profile-error')
@@ -287,9 +299,29 @@ export default {
       // }
     },
     toggleSaveProfile () {
-      this.$emit('set-local-storage-nickname', this.localStorageNickname === this.nickname ? null : this.nickname)
+      const newNickname = this.localStorageNickname === this.nickname ? null : this.nickname
+      
+      // Логируем действие пользователя
+      logUserAction('toggle_save_profile', {
+        nickname: this.nickname,
+        action: newNickname ? 'save' : 'unsave'
+      })
+      
+      // Обновляем пользователя в Sentry
+      if (newNickname) {
+        setSentryUser(newNickname)
+      } else {
+        clearSentryUser()
+      }
+      
+      this.$emit('set-local-storage-nickname', newNickname)
     },
     goToSpecificMatch (matchIndex) {
+      logUserAction('navigate_to_match_history', {
+        matchIndex,
+        nickname: this.nickname
+      })
+      
       // Переходим на страницу истории матчей с подсветкой конкретного матча
       this.$router.push({
         name: 'match-history',
@@ -303,6 +335,14 @@ export default {
         this.matches = items || []
       } catch (error) {
         console.error('Error loading last matches:', error)
+        
+        // Логируем ошибку загрузки матчей
+        logWarning('Failed to load recent matches', {
+          player_id: this.player.player_id,
+          selectedGame: this.selectedGame,
+          error: error.message
+        })
+        
         this.matches = []
       }
     },

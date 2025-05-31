@@ -84,6 +84,7 @@ import MatchCard from './components/MatchCard.vue'
 import EmptyState from './components/EmptyState.vue'
 import { faceitApi } from '../../services/faceitApi.js'
 import { getMatchResult, getMatchResultLetter, findPlayerTeam } from '../../utils/matchUtils.js'
+import { logWarning, logUserAction, logCriticalError } from '../../services/sentry.js'
 
 export default {
   components: {
@@ -182,17 +183,51 @@ export default {
           if (items.length < 20) {
             this.hasMore = false
           }
+          
+          logUserAction('matches_loaded', {
+            player_id: this.player.player_id,
+            page: this.currentPage - 1,
+            loadedCount: items.length,
+            totalMatches: this.matches.length
+          })
         } else {
           this.hasMore = false
+          
+          logWarning('No matches found for player', {
+            player_id: this.player.player_id,
+            selectedGame: this.selectedGame,
+            page: this.currentPage
+          })
         }
       } catch (error) {
         console.error('Error loading matches:', error)
         this.hasMore = false
+        
+        // Логируем ошибку загрузки матчей
+        if (error.message.includes('404')) {
+          logWarning('Matches not found for player', {
+            player_id: this.player.player_id,
+            selectedGame: this.selectedGame,
+            page: this.currentPage
+          })
+        } else {
+          logCriticalError(error, {
+            context: 'match_history_loading',
+            player_id: this.player.player_id,
+            selectedGame: this.selectedGame,
+            page: this.currentPage
+          })
+        }
       }
 
       this.isLoading = false
     },
     async resetAndLoad () {
+      logUserAction('reset_match_history', {
+        player_id: this.player?.player_id,
+        selectedGame: this.selectedGame
+      })
+      
       this.matches = []
       this.currentPage = 0
       this.hasMore = true

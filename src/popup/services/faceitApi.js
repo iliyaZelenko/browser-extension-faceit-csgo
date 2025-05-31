@@ -1,4 +1,5 @@
 import { FACEIT_API, GAMES, API_LIMITS } from '../utils/constants.js'
+import { logApiError, logUserAction } from './sentry.js'
 
 /**
  * @typedef {Object} Player
@@ -52,16 +53,16 @@ import { FACEIT_API, GAMES, API_LIMITS } from '../utils/constants.js'
  * @class FaceitApiService
  */
 class FaceitApiService {
-  /**
+    /**
      * Создает экземпляр FaceitApiService
      * Инициализирует базовый URL и заголовки для API запросов
      */
-  constructor () {
-    this.baseUrl = FACEIT_API.BASE_URL
-    this.headers = FACEIT_API.HEADERS
-  }
+    constructor() {
+        this.baseUrl = FACEIT_API.BASE_URL
+        this.headers = FACEIT_API.HEADERS
+    }
 
-  /**
+    /**
      * Общий метод для выполнения HTTP запросов к FACEIT API
      * Обрабатывает ошибки и преобразует ответ в JSON
      *
@@ -70,25 +71,45 @@ class FaceitApiService {
      * @returns {Promise<Object>} Результат запроса в формате JSON
      * @throws {Error} При ошибке HTTP запроса или сети
      */
-  async request (url, options = {}) {
-    try {
-      const response = await fetch(url, {
-        headers: this.headers,
-        ...options
-      })
+    async request(url, options = {}) {
+        try {
+            const response = await fetch(url, {
+                headers: this.headers,
+                ...options
+            })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
+            if (!response.ok) {
+                const error = new Error(`HTTP error! status: ${response.status}`)
 
-      return await response.json()
-    } catch (error) {
-      console.error('API request failed:', error)
-      throw error
+                // Логируем API ошибку в Sentry
+                logApiError(error, {
+                    url,
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries(response.headers.entries())
+                })
+
+                throw error
+            }
+
+            return await response.json()
+        } catch (error) {
+            console.error('API request failed:', error)
+
+            // Логируем сетевые ошибки в Sentry
+            if (!error.message.includes('HTTP error!')) {
+                logApiError(error, {
+                    url,
+                    errorType: 'network_error',
+                    options
+                })
+            }
+
+            throw error
+        }
     }
-  }
 
-  /**
+    /**
      * Поиск игрока по никнейму
      *
      * @param {string} nickname - Никнейм игрока для поиска
@@ -100,12 +121,14 @@ class FaceitApiService {
      * const player = await faceitApi.getPlayer('s1mple', 'csgo')
      * console.log(player.nickname) // 's1mple'
      */
-  async getPlayer (nickname, game = GAMES.CSGO) {
-    const url = `${this.baseUrl}/players?nickname=${nickname}&game=${game}`
-    return await this.request(url)
-  }
+    async getPlayer(nickname, game = GAMES.CSGO) {
+        logUserAction('search_player', { nickname, game })
 
-  /**
+        const url = `${this.baseUrl}/players?nickname=${nickname}&game=${game}`
+        return await this.request(url)
+    }
+
+    /**
      * Получение детальной статистики игрока
      *
      * @param {string} playerId - Уникальный ID игрока
@@ -117,12 +140,14 @@ class FaceitApiService {
      * const stats = await faceitApi.getPlayerStats('player-id', 'csgo')
      * console.log(stats.lifetime['Average K/D Ratio'])
      */
-  async getPlayerStats (playerId, game = GAMES.CSGO) {
-    const url = `${this.baseUrl}/players/${playerId}/stats/${game}`
-    return await this.request(url)
-  }
+    async getPlayerStats(playerId, game = GAMES.CSGO) {
+        logUserAction('load_player_stats', { playerId, game })
 
-  /**
+        const url = `${this.baseUrl}/players/${playerId}/stats/${game}`
+        return await this.request(url)
+    }
+
+    /**
      * Поиск игроков по части никнейма (автокомплит)
      *
      * @param {string} nickname - Часть никнейма для поиска
@@ -135,12 +160,14 @@ class FaceitApiService {
      * const result = await faceitApi.searchPlayers('s1mp', 'csgo', 10)
      * console.log(result.items) // Массив найденных игроков
      */
-  async searchPlayers (nickname, game = GAMES.CSGO, limit = 5) {
-    const url = `${this.baseUrl}/search/players?nickname=${nickname}&game=${game}&offset=0&limit=${limit}`
-    return await this.request(url)
-  }
+    async searchPlayers(nickname, game = GAMES.CSGO, limit = 5) {
+        logUserAction('search_players_autocomplete', { nickname, game, limit })
 
-  /**
+        const url = `${this.baseUrl}/search/players?nickname=${nickname}&game=${game}&offset=0&limit=${limit}`
+        return await this.request(url)
+    }
+
+    /**
      * Получение истории матчей игрока с пагинацией
      *
      * @param {string} playerId - Уникальный ID игрока
@@ -157,12 +184,14 @@ class FaceitApiService {
      * // Получить следующие 20 матчей
      * const nextMatches = await faceitApi.getPlayerMatches('player-id', 'csgo', 20, 20)
      */
-  async getPlayerMatches (playerId, game = GAMES.CSGO, offset = 0, limit = API_LIMITS.MATCHES_PER_PAGE) {
-    const url = `${this.baseUrl}/players/${playerId}/history?game=${game}&offset=${offset}&limit=${limit}`
-    return await this.request(url)
-  }
+    async getPlayerMatches(playerId, game = GAMES.CSGO, offset = 0, limit = API_LIMITS.MATCHES_PER_PAGE) {
+        logUserAction('load_player_matches', { playerId, game, offset, limit })
 
-  /**
+        const url = `${this.baseUrl}/players/${playerId}/history?game=${game}&offset=${offset}&limit=${limit}`
+        return await this.request(url)
+    }
+
+    /**
      * Получение последних матчей игрока (для превью/виджетов)
      * Ярлык для getPlayerMatches с лимитом 5 матчей
      *
@@ -175,9 +204,9 @@ class FaceitApiService {
      * const recentMatches = await faceitApi.getRecentMatches('player-id', 'csgo')
      * console.log(recentMatches.items.length) // <= 5
      */
-  async getRecentMatches (playerId, game = GAMES.CSGO) {
-    return await this.getPlayerMatches(playerId, game, 0, 5)
-  }
+    async getRecentMatches(playerId, game = GAMES.CSGO) {
+        return await this.getPlayerMatches(playerId, game, 0, 5)
+    }
 }
 
 // Создаем единственный экземпляр сервиса (Singleton pattern)
