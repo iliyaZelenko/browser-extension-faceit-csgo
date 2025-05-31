@@ -1,12 +1,12 @@
 {
     "extensionName": {
-        "message": "Faceit elo статистика",
-        "description": "Name of the extension."
+        "message": "Статистика Faceit elo (CS:GO, CS 2)",
+        "description": "Название расширения."
     },
 
     "extensionDescription": {
-        "message": "Search for a player by nickname, extended statistics on elo and other player statistics.",
-        "description": "Description of the extension."
+        "message": "Легко просматривайте свою статистику на Faceit для CS:GO и CS 2. Доступна расширенная статистика игрока, его карты, матчи.",
+        "description": "Описание расширения."
     },
 
     "goToProfile": {

@@ -1,11 +1,11 @@
 {
     "extensionName": {
-        "message": "Faceit elo istatistikleri",
+        "message": "Faceit elo istatistikleri (CS:GO, CS 2)",
         "description": "Uzantının adı."
     },
 
     "extensionDescription": {
-        "message": "Kullanıcı bağlantılara tıkladığında bildirim gösterir.",
+        "message": "CS:GO ve CS 2 için Faceit'teki istatistiklerinizi kolayca görüntüleyin. Genişletilmiş oyuncu istatistikleri, haritaları, maçları mevcuttur.",
         "description": "Uzantının açıklaması."
     },
 

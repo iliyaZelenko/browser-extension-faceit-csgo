@@ -1,12 +1,12 @@
 {
     "extensionName": {
-        "message": "Faceit Elo Statistiken",
-        "description": "Name of the extension."
+        "message": "Faceit elo Statistiken (CS:GO, CS 2)",
+        "description": "Name der Erweiterung."
     },
 
     "extensionDescription": {
-        "message": "Zeigt eine Benachrichtigung an, wenn der Benutzer auf Links klickt.",
-        "description": "Description of the extension."
+        "message": "Zeigen Sie einfach Ihre Statistiken auf Faceit für CS:GO und CS 2 an. Erweiterte Spielerstatistiken, seine Karten und Matches sind verfügbar.",
+        "description": "Beschreibung der Erweiterung."
     },
 
     "goToProfile": {

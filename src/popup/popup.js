@@ -14,6 +14,48 @@ import browser from 'webextension-polyfill'
 import { initSentry, logCriticalError } from './services/sentry.js'
 import analyticsService from './services/analytics.js'
 
+// Импортируем английские сообщения для принудительного использования английского языка
+// import enMessages from '../_locales/en/messages.json'
+// browser.i18n.getMessage = function(messageName, substitutions) {
+//     const messageData = enMessages[messageName]
+//     if (!messageData) {
+//         console.warn(`Message not found: ${messageName}`)
+//         return messageName // возвращаем ключ если сообщение не найдено
+//     }
+
+//     let message = messageData.message || messageData
+
+//     // Обрабатываем подстановки (placeholders)
+//     if (substitutions) {
+//         if (Array.isArray(substitutions)) {
+//             substitutions.forEach((value, index) => {
+//                 message = message.replace(new RegExp(`\\$${index + 1}`, 'g'), value)
+//             })
+//         } else {
+//             message = message.replace(/\$1/g, substitutions)
+//         }
+
+//         // Обрабатываем именованные плейсхолдеры
+//         if (messageData.placeholders) {
+//             Object.keys(messageData.placeholders).forEach(placeholderName => {
+//                 const placeholder = messageData.placeholders[placeholderName]
+//                 if (placeholder.content) {
+//                     const contentMatch = placeholder.content.match(/\$(\d+)/)
+//                     if (contentMatch && substitutions) {
+//                         const index = parseInt(contentMatch[1]) - 1
+//                         const value = Array.isArray(substitutions) ? substitutions[index] : substitutions
+//                         message = message.replace(new RegExp(`\\$${placeholderName}\\$`, 'g'), value)
+//                     }
+//                 }
+//             })
+//         }
+//     }
+
+//     return message
+// }
+// // Создаем браузер с принудительным английским языком
+// const englishOnlyBrowser = browser
+
 Vue.prototype.$browser = browser
 Vue.prototype.$analytics = analyticsService
 
