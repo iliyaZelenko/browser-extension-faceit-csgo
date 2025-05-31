@@ -5,6 +5,7 @@
   "presets": [
     ["@babel/preset-env", {
       "useBuiltIns": "usage",
+      "corejs": 2,
       "targets": {
         // https://jamie.build/last-2-versions
         // Do not use "not op_mini all". It will cut Internet from most of the users with slow Internet and low-power phones.

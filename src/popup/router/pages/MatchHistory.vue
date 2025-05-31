@@ -11,7 +11,7 @@
       >
         <div
           v-for="(match, index) in recentMatches"
-          :key="match.match_id"
+          :key="`recent-${match.match_id}`"
           :class="['wl-circle', getMatchResult(match)]"
           :title="getMatchResultText(match)"
           @click="goToSpecificMatch(index)"
@@ -41,7 +41,7 @@
       >
         <MatchCard
           v-for="(match, index) in matches"
-          :key="match.match_id"
+          :key="`match-${match.match_id}`"
           :match="match"
           :player-id="player.player_id"
           :highlighted="highlightedMatchIndex === index"
