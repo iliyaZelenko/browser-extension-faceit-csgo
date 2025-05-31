@@ -3,6 +3,7 @@ import EloStats from './pages/EloStats'
 import FullStatsPage from './pages/FullStats'
 import MapStats from './pages/MapStats'
 import MatchHistory from './pages/MatchHistory'
+import FavoritePlayers from './pages/FavoritePlayers'
 
 export default [{
     path: '/',
@@ -26,6 +27,11 @@ export default [{
             path: '/match-history',
             name: 'match-history',
             component: MatchHistory
+        },
+        {
+            path: '/favorites',
+            name: 'favorites',
+            component: FavoritePlayers
         }
     ]
 }]

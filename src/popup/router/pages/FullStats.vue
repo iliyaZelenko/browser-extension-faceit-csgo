@@ -138,7 +138,6 @@ export default {
 .full-stats-wrapper {
   position: relative;
   min-height: 100vh;
-  padding: 20px;
 }
 
 #background {

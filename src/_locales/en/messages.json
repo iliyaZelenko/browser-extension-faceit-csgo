@@ -311,6 +311,15 @@
         "message": "Just now"
     },
 
+    "minutesAgo": {
+        "message": "$minutes$ minutes ago",
+        "placeholders": {
+            "minutes": {
+                "content": "$1"
+            }
+        }
+    },
+
     "hoursAgo": {
         "message": "$hours$ hours ago",
         "placeholders": {
@@ -331,5 +340,53 @@
                 "content": "$1"
             }
         }
+    },
+
+    "favorites": {
+        "message": "Favorites"
+    },
+
+    "favoriteButton": {
+        "message": "Favorite Players"
+    },
+
+    "favoritePlayers": {
+        "message": "Favorite Players"
+    },
+
+    "addToFavorites": {
+        "message": "Add to Favorites"
+    },
+
+    "removeFromFavorites": {
+        "message": "Remove from Favorites"
+    },
+
+    "noFavoritePlayers": {
+        "message": "You have no favorite players"
+    },
+
+    "addFirstFavorite": {
+        "message": "Find a player and add them to favorites"
+    },
+
+    "viewPlayerStats": {
+        "message": "View Statistics"
+    },
+
+    "removeFromFavoritesList": {
+        "message": "Remove from list"
+    },
+
+    "backToSearch": {
+        "message": "Back to Search"
+    },
+
+    "favoritesSaved": {
+        "message": "Added to favorites"
+    },
+
+    "favoritesRemoved": {
+        "message": "Removed from favorites"
     }
 }

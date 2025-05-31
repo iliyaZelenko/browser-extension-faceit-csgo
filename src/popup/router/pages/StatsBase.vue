@@ -10,7 +10,7 @@
     <div style="width: 100%; height: 60px; background: red;"></div>
 
     <div style="padding: 8px;">
-      <div style="display: flex; justify-content: center;">
+      <div style="display: flex; justify-content: center; align-items: center; gap: 8px;">
         <!--
         <input
           v-model="nickname"
@@ -70,23 +70,14 @@
             </div>
           </template>
         </cool-select>
-        <!--
-        &lt;!&ndash; gap &ndash;&gt;
-        <div style="width: 10px;" />
-
-        <button @click="findPlayer">
-          <span v-if="loading">
-            Loading...
-          </span>
-          <span v-else>
-            {{ $browser.i18n.getMessage('getStats') }}
-          </span>
-        </button>
-        -->
+        
+        <!-- Кнопка избранных игроков -->
+        <FavoritesListButton />
       </div>
 
+      <!-- Табы (скрываются на странице "Избранные игроки") -->
       <AnimatedTabs 
-        v-if="player"
+        v-if="player && $route.name !== 'favorites'"
         :tabs="tabs"
       />
 
@@ -107,10 +98,15 @@
 <script>
 import { CoolSelect } from 'vue-cool-select'
 import AnimatedTabs from './components/AnimatedTabs.vue'
+import FavoritesListButton from './components/FavoritesListButton.vue'
 import { FACEIT_API, GAMES } from '../../utils/constants.js'
 
 export default {
-  components: { CoolSelect, AnimatedTabs },
+  components: { 
+    CoolSelect, 
+    AnimatedTabs,
+    FavoritesListButton
+  },
   data () {
     const storageNickname = localStorage.getItem('nickname')
 
@@ -176,6 +172,13 @@ export default {
       await this.onSearch(this.nickname)
       await this.findPlayer()
     }
+    
+    // Слушаем событие поиска игрока из списка избранных
+    this.$root.$on('search-player', this.searchPlayerFromFavorites)
+  },
+  beforeDestroy() {
+    // Убираем слушатель при уничтожении компонента
+    this.$root.$off('search-player', this.searchPlayerFromFavorites)
   },
   methods: {
     setLocalStorageNickname (val) {
@@ -295,7 +298,15 @@ export default {
       }
 
       return avatar
-    }
+    },
+    async searchPlayerFromFavorites(nickname) {
+      // Устанавливаем никнейм
+      this.nickname = nickname
+      
+      // Выполняем поиск
+      await this.onSearch(nickname)
+      await this.findPlayer()
+    },
   }
 }
 </script>

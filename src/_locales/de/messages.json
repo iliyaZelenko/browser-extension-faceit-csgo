@@ -228,5 +228,53 @@
 
     "overallStatistics": {
         "message": "Gesamtstatistiken"
+    },
+
+    "favorites": {
+        "message": "Favoriten"
+    },
+
+    "favoriteButton": {
+        "message": "Lieblingsspieler"
+    },
+
+    "favoritePlayers": {
+        "message": "Lieblingsspieler"
+    },
+
+    "addToFavorites": {
+        "message": "Zu Favoriten hinzufügen"
+    },
+
+    "removeFromFavorites": {
+        "message": "Aus Favoriten entfernen"
+    },
+
+    "noFavoritePlayers": {
+        "message": "Sie haben keine Lieblingsspieler"
+    },
+
+    "addFirstFavorite": {
+        "message": "Finden Sie einen Spieler und fügen Sie ihn zu den Favoriten hinzu"
+    },
+
+    "viewPlayerStats": {
+        "message": "Statistiken anzeigen"
+    },
+
+    "removeFromFavoritesList": {
+        "message": "Aus Liste entfernen"
+    },
+
+    "backToSearch": {
+        "message": "Zurück zur Suche"
+    },
+
+    "favoritesSaved": {
+        "message": "Zu Favoriten hinzugefügt"
+    },
+
+    "favoritesRemoved": {
+        "message": "Aus Favoriten entfernt"
     }
 }

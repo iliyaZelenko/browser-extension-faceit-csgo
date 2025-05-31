@@ -291,11 +291,11 @@
     },
 
     "showDetails": {
-        "message": "Показать подробности"
+        "message": "Показать детали"
     },
 
     "hideDetails": {
-        "message": "Скрыть подробности"
+        "message": "Скрыть детали"
     },
 
     "matchId": {
@@ -308,6 +308,15 @@
 
     "justNow": {
         "message": "Только что"
+    },
+
+    "minutesAgo": {
+        "message": "$minutes$ минут назад",
+        "placeholders": {
+            "minutes": {
+                "content": "$1"
+            }
+        }
     },
 
     "hoursAgo": {
@@ -330,5 +339,53 @@
                 "content": "$1"
             }
         }
+    },
+
+    "favorites": {
+        "message": "Избранные"
+    },
+
+    "favoriteButton": {
+        "message": "Избранные игроки"
+    },
+
+    "favoritePlayers": {
+        "message": "Избранные игроки"
+    },
+
+    "addToFavorites": {
+        "message": "Добавить в избранное"
+    },
+
+    "removeFromFavorites": {
+        "message": "Удалить из избранного"
+    },
+
+    "noFavoritePlayers": {
+        "message": "У вас нет избранных игроков"
+    },
+
+    "addFirstFavorite": {
+        "message": "Найдите игрока и добавьте его в избранное"
+    },
+
+    "viewPlayerStats": {
+        "message": "Посмотреть статистику"
+    },
+
+    "removeFromFavoritesList": {
+        "message": "Удалить из списка"
+    },
+
+    "backToSearch": {
+        "message": "Назад к поиску"
+    },
+
+    "favoritesSaved": {
+        "message": "Добавлено в избранное"
+    },
+
+    "favoritesRemoved": {
+        "message": "Удалено из избранного"
     }
 }

@@ -14,6 +14,11 @@
         alt="flag"
         style="vertical-align: middle;"
       >
+      
+      <!-- Кнопка избранного -->
+      <FavoriteButton 
+        :player="player"
+      />
     </div>
     <!--
     <img
@@ -122,11 +127,13 @@
 <script>
 import EmptyState from './components/EmptyState.vue'
 import RecentResults from './components/RecentResults.vue'
+import FavoriteButton from './components/FavoriteButton.vue'
 
 export default {
   components: {
     EmptyState,
-    RecentResults
+    RecentResults,
+    FavoriteButton
   },
   props: {
     player: {

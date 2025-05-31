@@ -121,10 +121,13 @@ export default {
       const timestamp = this.match.finished_at || dateString
       const date = new Date(timestamp * 1000) // Конвертируем секунды в миллисекунды
       const now = new Date()
+      const diffInMinutes = Math.floor((now - date) / (1000 * 60))
       const diffInHours = Math.floor((now - date) / (1000 * 60 * 60))
       
-      if (diffInHours < 1) {
+      if (diffInMinutes < 1) {
         return this.$browser.i18n.getMessage('justNow')
+      } else if (diffInMinutes < 60) {
+        return this.$browser.i18n.getMessage('minutesAgo', [diffInMinutes])
       } else if (diffInHours < 24) {
         return this.$browser.i18n.getMessage('hoursAgo', [diffInHours])
       } else {
