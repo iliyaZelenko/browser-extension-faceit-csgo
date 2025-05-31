@@ -1,0 +1,252 @@
+{
+    "extensionName": {
+        "message": "Faceit等级统计",
+        "description": "扩展名称。"
+    },
+
+    "extensionDescription": {
+        "message": "用户点击链接时显示通知。",
+        "description": "扩展描述。"
+    },
+
+    "goToProfile": {
+        "message": "打开个人资料",
+        "description": ""
+    },
+
+    "searchPlayerNoPlayeyFoundByRequest": {
+        "message": "未找到符合条件的玩家。",
+        "description": ""
+    },
+
+    "searchPlayerMinimalLettersInfo": {
+        "message": "搜索至少需要$lettersCount$个字符。",
+        "description": "",
+        "placeholders": {
+            "lettersCount": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "showEloStats": {
+        "message": "等级"
+    },
+
+    "showFullStats": {
+        "message": "统计"
+    },
+
+    "level": {
+        "message": "等级："
+    },
+
+    "eloRangeFor": {
+        "message": "$lvl$级的等级范围：",
+        "placeholders": {
+            "lvl": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "playerCanRaiseLvlIfHeGets": {
+        "message": "玩家获得以下分数可升级："
+    },
+
+    "playerHas": {
+        "message": "玩家拥有："
+    },
+
+    "maximalLvl": {
+        "message": "最高等级"
+    },
+
+    "minimalLvl": {
+        "message": "最低等级"
+    },
+
+    "playerMayLoseLvlIfHeLoses": {
+        "message": "玩家失败可能降级："
+    },
+
+    "recentResults": {
+        "message": "最近结果："
+    },
+
+    "showThisProfileAfterOpening": {
+        "message": "打开后显示此个人资料"
+    },
+
+    "saved": {
+        "message": "（已保存）"
+    },
+
+    "averageHeadshots": {
+        "message": "平均爆头率："
+    },
+
+    "averageKDRatio": {
+        "message": "平均K/D比率："
+    },
+
+    "currentWinStreak": {
+        "message": "当前连胜："
+    },
+
+    "matches": {
+        "message": "比赛："
+    },
+
+    "wins": {
+        "message": "胜利："
+    },
+
+    "winRate": {
+        "message": "胜率："
+    },
+
+    "longestWinStreak": {
+        "message": "最长连胜："
+    },
+
+    "statsByMap": {
+        "message": "地图统计"
+    },
+
+    "mapDetailedStats": {
+        "message": "详细统计"
+    },
+
+    "mapAdditionalStats": {
+        "message": "附加统计"
+    },
+
+    "backToMapsList": {
+        "message": "返回地图列表"
+    },
+
+    "clickForDetailedStats": {
+        "message": "点击查看详细统计"
+    },
+
+    "elo": {
+        "message": "等级："
+    },
+
+    "playerSearchPlaceholder": {
+        "message": "输入玩家昵称"
+    },
+
+    "kdRatio": {
+        "message": "K/D比率"
+    },
+
+    "headshotsPercentage": {
+        "message": "爆头百分比"
+    },
+
+    "averageKills": {
+        "message": "平均击杀"
+    },
+
+    "averageDeaths": {
+        "message": "平均死亡"
+    },
+
+    "averageAssists": {
+        "message": "平均助攻"
+    },
+
+    "averageMvps": {
+        "message": "平均MVP"
+    },
+
+    "totalKills": {
+        "message": "总击杀："
+    },
+
+    "totalDeaths": {
+        "message": "总死亡："
+    },
+
+    "totalAssists": {
+        "message": "总助攻："
+    },
+
+    "headshotsPerMatch": {
+        "message": "每场爆头："
+    },
+
+    "tripleKills": {
+        "message": "三杀："
+    },
+
+    "quadroKills": {
+        "message": "四杀："
+    },
+
+    "pentaKills": {
+        "message": "五杀："
+    },
+
+    "totalRounds": {
+        "message": "总回合："
+    },
+
+    "statsNotLoaded": {
+        "message": "统计数据未加载。"
+    },
+
+    "win": {
+        "message": "胜利"
+    },
+
+    "loss": {
+        "message": "失败"
+    },
+
+    "loadingMatches": {
+        "message": "加载比赛中..."
+    },
+
+    "loadingTitle": {
+        "message": "加载个人资料..."
+    },
+
+    "loadingDescription": {
+        "message": "正在从Faceit服务器获取玩家数据"
+    },
+
+    "loadingErrorTitle": {
+        "message": "无法加载个人资料"
+    },
+
+    "loadingErrorDescription": {
+        "message": "请检查网络连接或稍后重试"
+    },
+
+    "retry": {
+        "message": "重试"
+    },
+
+    "searchPlayer": {
+        "message": "搜索玩家"
+    },
+
+    "detailedMatchHistory": {
+        "message": "详细比赛历史"
+    },
+
+    "noMatchesFound": {
+        "message": "未找到比赛"
+    },
+
+    "loading": {
+        "message": "加载中"
+    },
+
+    "loadMoreMatches": {
+        "message": "加载更多比赛"
+    }
+}

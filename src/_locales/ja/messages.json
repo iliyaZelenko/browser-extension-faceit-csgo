@@ -1,0 +1,252 @@
+{
+    "extensionName": {
+        "message": "Faceit eloスタティスティクス",
+        "description": "拡張機能の名前。"
+    },
+
+    "extensionDescription": {
+        "message": "ユーザーがリンクをクリックした時に通知を表示します。",
+        "description": "拡張機能の説明。"
+    },
+
+    "goToProfile": {
+        "message": "プロフィールを開く",
+        "description": ""
+    },
+
+    "searchPlayerNoPlayeyFoundByRequest": {
+        "message": "リクエストに一致するプレイヤーが見つかりませんでした。",
+        "description": ""
+    },
+
+    "searchPlayerMinimalLettersInfo": {
+        "message": "検索には最低$lettersCount$文字が必要です。",
+        "description": "",
+        "placeholders": {
+            "lettersCount": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "showEloStats": {
+        "message": "Elo"
+    },
+
+    "showFullStats": {
+        "message": "スタッツ"
+    },
+
+    "level": {
+        "message": "レベル: "
+    },
+
+    "eloRangeFor": {
+        "message": "$lvl$ レベルのElo範囲:",
+        "placeholders": {
+            "lvl": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "playerCanRaiseLvlIfHeGets": {
+        "message": "このスコアを獲得すればレベルアップできます: "
+    },
+
+    "playerHas": {
+        "message": "プレイヤーのスコア: "
+    },
+
+    "maximalLvl": {
+        "message": "最大レベル"
+    },
+
+    "minimalLvl": {
+        "message": "最小レベル"
+    },
+
+    "playerMayLoseLvlIfHeLoses": {
+        "message": "負けるとレベルダウンする可能性があります: "
+    },
+
+    "recentResults": {
+        "message": "最近の結果: "
+    },
+
+    "showThisProfileAfterOpening": {
+        "message": "開いた後にこのプロフィールを表示"
+    },
+
+    "saved": {
+        "message": " (保存済み)"
+    },
+
+    "averageHeadshots": {
+        "message": "平均ヘッドショット: "
+    },
+
+    "averageKDRatio": {
+        "message": "平均K/D比: "
+    },
+
+    "currentWinStreak": {
+        "message": "現在の連勝: "
+    },
+
+    "matches": {
+        "message": "マッチ: "
+    },
+
+    "wins": {
+        "message": "勝利: "
+    },
+
+    "winRate": {
+        "message": "勝率: "
+    },
+
+    "longestWinStreak": {
+        "message": "最長連勝: "
+    },
+
+    "statsByMap": {
+        "message": "マップ別スタッツ"
+    },
+
+    "mapDetailedStats": {
+        "message": "詳細統計"
+    },
+
+    "mapAdditionalStats": {
+        "message": "追加統計"
+    },
+
+    "backToMapsList": {
+        "message": "マップリストに戻る"
+    },
+
+    "clickForDetailedStats": {
+        "message": "詳細統計をクリック"
+    },
+
+    "elo": {
+        "message": "Elo:"
+    },
+
+    "playerSearchPlaceholder": {
+        "message": "プレイヤー名を入力"
+    },
+
+    "kdRatio": {
+        "message": "K/D比"
+    },
+
+    "headshotsPercentage": {
+        "message": "ヘッドショット率"
+    },
+
+    "averageKills": {
+        "message": "平均キル数"
+    },
+
+    "averageDeaths": {
+        "message": "平均デス数"
+    },
+
+    "averageAssists": {
+        "message": "平均アシスト"
+    },
+
+    "averageMvps": {
+        "message": "平均MVP"
+    },
+
+    "totalKills": {
+        "message": "総キル数:"
+    },
+
+    "totalDeaths": {
+        "message": "総デス数:"
+    },
+
+    "totalAssists": {
+        "message": "総アシスト:"
+    },
+
+    "headshotsPerMatch": {
+        "message": "1マッチあたりのヘッドショット:"
+    },
+
+    "tripleKills": {
+        "message": "トリプルキル:"
+    },
+
+    "quadroKills": {
+        "message": "クアドラキル:"
+    },
+
+    "pentaKills": {
+        "message": "ペンタキル:"
+    },
+
+    "totalRounds": {
+        "message": "総ラウンド数:"
+    },
+
+    "statsNotLoaded": {
+        "message": "統計データが読み込まれていません。"
+    },
+
+    "win": {
+        "message": "勝利"
+    },
+
+    "loss": {
+        "message": "敗北"
+    },
+
+    "loadingMatches": {
+        "message": "マッチを読み込み中..."
+    },
+
+    "loadingTitle": {
+        "message": "プロフィールを読み込み中..."
+    },
+
+    "loadingDescription": {
+        "message": "Faceitサーバーからプレイヤーデータを取得中"
+    },
+
+    "loadingErrorTitle": {
+        "message": "プロフィールを読み込めませんでした"
+    },
+
+    "loadingErrorDescription": {
+        "message": "インターネット接続を確認するか、後でもう一度お試しください"
+    },
+
+    "retry": {
+        "message": "再試行"
+    },
+
+    "searchPlayer": {
+        "message": "プレイヤー検索"
+    },
+
+    "detailedMatchHistory": {
+        "message": "詳細マッチ履歴"
+    },
+
+    "noMatchesFound": {
+        "message": "マッチが見つかりませんでした"
+    },
+
+    "loading": {
+        "message": "読み込み中"
+    },
+
+    "loadMoreMatches": {
+        "message": "もっとマッチを読み込む"
+    }
+}

@@ -1,0 +1,252 @@
+{
+    "extensionName": {
+        "message": "Faceit elo istatistikleri",
+        "description": "Uzantının adı."
+    },
+
+    "extensionDescription": {
+        "message": "Kullanıcı bağlantılara tıkladığında bildirim gösterir.",
+        "description": "Uzantının açıklaması."
+    },
+
+    "goToProfile": {
+        "message": "Profili aç",
+        "description": ""
+    },
+
+    "searchPlayerNoPlayeyFoundByRequest": {
+        "message": "İsteğe uygun oyuncu bulunamadı.",
+        "description": ""
+    },
+
+    "searchPlayerMinimalLettersInfo": {
+        "message": "Arama için en az $lettersCount$ harf gerekli.",
+        "description": "",
+        "placeholders": {
+            "lettersCount": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "showEloStats": {
+        "message": "Elo"
+    },
+
+    "showFullStats": {
+        "message": "İstatistikler"
+    },
+
+    "level": {
+        "message": "Seviye: "
+    },
+
+    "eloRangeFor": {
+        "message": "$lvl$ seviyesi için elo aralığı:",
+        "placeholders": {
+            "lvl": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "playerCanRaiseLvlIfHeGets": {
+        "message": "Oyuncu şu puan alırsa seviye yükseltebilir: "
+    },
+
+    "playerHas": {
+        "message": "Oyuncunun puanı: "
+    },
+
+    "maximalLvl": {
+        "message": "maksimum seviye"
+    },
+
+    "minimalLvl": {
+        "message": "minimum seviye"
+    },
+
+    "playerMayLoseLvlIfHeLoses": {
+        "message": "Oyuncu kaybederse seviye düşebilir: "
+    },
+
+    "recentResults": {
+        "message": "Son sonuçlar: "
+    },
+
+    "showThisProfileAfterOpening": {
+        "message": "Açıldığında bu profili göster"
+    },
+
+    "saved": {
+        "message": " (Kaydedildi)"
+    },
+
+    "averageHeadshots": {
+        "message": "Ortalama Kafa Vuruşları: "
+    },
+
+    "averageKDRatio": {
+        "message": "Ortalama K/D Oranı: "
+    },
+
+    "currentWinStreak": {
+        "message": "Mevcut Galibiyet Serisi: "
+    },
+
+    "matches": {
+        "message": "Maçlar: "
+    },
+
+    "wins": {
+        "message": "Galibiyetler: "
+    },
+
+    "winRate": {
+        "message": "Galibiyet Oranı: "
+    },
+
+    "longestWinStreak": {
+        "message": "En Uzun Galibiyet Serisi: "
+    },
+
+    "statsByMap": {
+        "message": "Harita istatistikleri"
+    },
+
+    "mapDetailedStats": {
+        "message": "Detaylı İstatistikler"
+    },
+
+    "mapAdditionalStats": {
+        "message": "Ek İstatistikler"
+    },
+
+    "backToMapsList": {
+        "message": "Harita listesine dön"
+    },
+
+    "clickForDetailedStats": {
+        "message": "Detaylı istatistikler için tıklayın"
+    },
+
+    "elo": {
+        "message": "Elo:"
+    },
+
+    "playerSearchPlaceholder": {
+        "message": "Oyuncu takma adını girin"
+    },
+
+    "kdRatio": {
+        "message": "K/D Oranı"
+    },
+
+    "headshotsPercentage": {
+        "message": "Kafa Vuruş Yüzdesi"
+    },
+
+    "averageKills": {
+        "message": "Ortalama Öldürme"
+    },
+
+    "averageDeaths": {
+        "message": "Ortalama Ölüm"
+    },
+
+    "averageAssists": {
+        "message": "Ortalama Asist"
+    },
+
+    "averageMvps": {
+        "message": "Ortalama MVP"
+    },
+
+    "totalKills": {
+        "message": "Toplam Öldürme:"
+    },
+
+    "totalDeaths": {
+        "message": "Toplam Ölüm:"
+    },
+
+    "totalAssists": {
+        "message": "Toplam Asist:"
+    },
+
+    "headshotsPerMatch": {
+        "message": "Maç Başına Kafa Vuruş:"
+    },
+
+    "tripleKills": {
+        "message": "Üçlü Öldürme:"
+    },
+
+    "quadroKills": {
+        "message": "Dörtlü Öldürme:"
+    },
+
+    "pentaKills": {
+        "message": "Beşli Öldürme:"
+    },
+
+    "totalRounds": {
+        "message": "Toplam Raund:"
+    },
+
+    "statsNotLoaded": {
+        "message": "İstatistik verileri yüklenmedi."
+    },
+
+    "win": {
+        "message": "Galibiyet"
+    },
+
+    "loss": {
+        "message": "Mağlubiyet"
+    },
+
+    "loadingMatches": {
+        "message": "Maçlar yükleniyor..."
+    },
+
+    "loadingTitle": {
+        "message": "Profil yükleniyor..."
+    },
+
+    "loadingDescription": {
+        "message": "Faceit sunucularından oyuncu verileri alınıyor"
+    },
+
+    "loadingErrorTitle": {
+        "message": "Profil yüklenemedi"
+    },
+
+    "loadingErrorDescription": {
+        "message": "İnternet bağlantınızı kontrol edin veya daha sonra tekrar deneyin"
+    },
+
+    "retry": {
+        "message": "Tekrar dene"
+    },
+
+    "searchPlayer": {
+        "message": "Oyuncu ara"
+    },
+
+    "detailedMatchHistory": {
+        "message": "Detaylı maç geçmişi"
+    },
+
+    "noMatchesFound": {
+        "message": "Maç bulunamadı"
+    },
+
+    "loading": {
+        "message": "Yükleniyor"
+    },
+
+    "loadMoreMatches": {
+        "message": "Daha fazla maç yükle"
+    }
+}

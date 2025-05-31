@@ -1,0 +1,252 @@
+{
+    "extensionName": {
+        "message": "Faceit elo 통계",
+        "description": "확장 프로그램의 이름입니다."
+    },
+
+    "extensionDescription": {
+        "message": "사용자가 링크를 클릭할 때 알림을 표시합니다.",
+        "description": "확장 프로그램의 설명입니다."
+    },
+
+    "goToProfile": {
+        "message": "프로필 열기",
+        "description": ""
+    },
+
+    "searchPlayerNoPlayeyFoundByRequest": {
+        "message": "요청에 맞는 플레이어를 찾을 수 없습니다.",
+        "description": ""
+    },
+
+    "searchPlayerMinimalLettersInfo": {
+        "message": "검색하려면 최소 $lettersCount$글자가 필요합니다.",
+        "description": "",
+        "placeholders": {
+            "lettersCount": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "showEloStats": {
+        "message": "Elo"
+    },
+
+    "showFullStats": {
+        "message": "통계"
+    },
+
+    "level": {
+        "message": "레벨: "
+    },
+
+    "eloRangeFor": {
+        "message": "$lvl$ 레벨의 Elo 범위:",
+        "placeholders": {
+            "lvl": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "playerCanRaiseLvlIfHeGets": {
+        "message": "이 점수를 얻으면 레벨업할 수 있습니다: "
+    },
+
+    "playerHas": {
+        "message": "플레이어의 점수: "
+    },
+
+    "maximalLvl": {
+        "message": "최대 레벨"
+    },
+
+    "minimalLvl": {
+        "message": "최소 레벨"
+    },
+
+    "playerMayLoseLvlIfHeLoses": {
+        "message": "패배하면 레벨이 떨어질 수 있습니다: "
+    },
+
+    "recentResults": {
+        "message": "최근 결과: "
+    },
+
+    "showThisProfileAfterOpening": {
+        "message": "열린 후 이 프로필 표시"
+    },
+
+    "saved": {
+        "message": " (저장됨)"
+    },
+
+    "averageHeadshots": {
+        "message": "평균 헤드샷: "
+    },
+
+    "averageKDRatio": {
+        "message": "평균 K/D 비율: "
+    },
+
+    "currentWinStreak": {
+        "message": "현재 연승: "
+    },
+
+    "matches": {
+        "message": "경기: "
+    },
+
+    "wins": {
+        "message": "승리: "
+    },
+
+    "winRate": {
+        "message": "승률: "
+    },
+
+    "longestWinStreak": {
+        "message": "최장 연승: "
+    },
+
+    "statsByMap": {
+        "message": "맵별 통계"
+    },
+
+    "mapDetailedStats": {
+        "message": "상세 통계"
+    },
+
+    "mapAdditionalStats": {
+        "message": "추가 통계"
+    },
+
+    "backToMapsList": {
+        "message": "맵 목록으로 돌아가기"
+    },
+
+    "clickForDetailedStats": {
+        "message": "상세 통계를 보려면 클릭"
+    },
+
+    "elo": {
+        "message": "Elo:"
+    },
+
+    "playerSearchPlaceholder": {
+        "message": "플레이어 닉네임 입력"
+    },
+
+    "kdRatio": {
+        "message": "K/D 비율"
+    },
+
+    "headshotsPercentage": {
+        "message": "헤드샷 비율"
+    },
+
+    "averageKills": {
+        "message": "평균 킬"
+    },
+
+    "averageDeaths": {
+        "message": "평균 데스"
+    },
+
+    "averageAssists": {
+        "message": "평균 어시스트"
+    },
+
+    "averageMvps": {
+        "message": "평균 MVP"
+    },
+
+    "totalKills": {
+        "message": "총 킬 수:"
+    },
+
+    "totalDeaths": {
+        "message": "총 데스 수:"
+    },
+
+    "totalAssists": {
+        "message": "총 어시스트:"
+    },
+
+    "headshotsPerMatch": {
+        "message": "경기당 헤드샷:"
+    },
+
+    "tripleKills": {
+        "message": "트리플 킬:"
+    },
+
+    "quadroKills": {
+        "message": "쿼드라 킬:"
+    },
+
+    "pentaKills": {
+        "message": "펜타 킬:"
+    },
+
+    "totalRounds": {
+        "message": "총 라운드:"
+    },
+
+    "statsNotLoaded": {
+        "message": "통계 데이터가 로드되지 않았습니다."
+    },
+
+    "win": {
+        "message": "승리"
+    },
+
+    "loss": {
+        "message": "패배"
+    },
+
+    "loadingMatches": {
+        "message": "경기 로딩 중..."
+    },
+
+    "loadingTitle": {
+        "message": "프로필 로딩 중..."
+    },
+
+    "loadingDescription": {
+        "message": "Faceit 서버에서 플레이어 데이터를 가져오는 중"
+    },
+
+    "loadingErrorTitle": {
+        "message": "프로필을 로드할 수 없습니다"
+    },
+
+    "loadingErrorDescription": {
+        "message": "인터넷 연결을 확인하거나 나중에 다시 시도하세요"
+    },
+
+    "retry": {
+        "message": "다시 시도"
+    },
+
+    "searchPlayer": {
+        "message": "플레이어 검색"
+    },
+
+    "detailedMatchHistory": {
+        "message": "상세 경기 기록"
+    },
+
+    "noMatchesFound": {
+        "message": "경기를 찾을 수 없습니다"
+    },
+
+    "loading": {
+        "message": "로딩 중"
+    },
+
+    "loadMoreMatches": {
+        "message": "더 많은 경기 로드"
+    }
+}
