@@ -228,5 +228,173 @@
 
     "overallStatistics": {
         "message": "Statistiques générales"
+    },
+
+    "details": {
+        "message": "Détails"
+    },
+
+    "viewDetailedHistory": {
+        "message": "Voir l'historique détaillé des matchs"
+    },
+
+    "win": {
+        "message": "Victoire"
+    },
+
+    "loss": {
+        "message": "Défaite"
+    },
+
+    "losses": {
+        "message": "Défaites"
+    },
+
+    "lastGame": {
+        "message": "Dernier match"
+    },
+
+    "gamesAgo": {
+        "message": "Il y a $count$ matchs",
+        "placeholders": {
+            "count": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "detailedMatchHistory": {
+        "message": "Historique détaillé des matchs"
+    },
+
+    "matchHistory": {
+        "message": "Historique"
+    },
+
+    "loadingMatches": {
+        "message": "Chargement des matchs..."
+    },
+
+    "noMatchesFound": {
+        "message": "Aucun match trouvé"
+    },
+
+    "loading": {
+        "message": "Chargement"
+    },
+
+    "loadMoreMatches": {
+        "message": "Charger plus de matchs"
+    },
+
+    "headshots": {
+        "message": "Headshots"
+    },
+
+    "showDetails": {
+        "message": "Afficher les détails"
+    },
+
+    "hideDetails": {
+        "message": "Masquer les détails"
+    },
+
+    "matchId": {
+        "message": "ID du match"
+    },
+
+    "duration": {
+        "message": "Durée"
+    },
+
+    "justNow": {
+        "message": "À l'instant"
+    },
+
+    "minutesAgo": {
+        "message": "Il y a $minutes$ minutes",
+        "placeholders": {
+            "minutes": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "hoursAgo": {
+        "message": "Il y a $hours$ heures",
+        "placeholders": {
+            "hours": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "yesterday": {
+        "message": "Hier"
+    },
+
+    "daysAgo": {
+        "message": "Il y a $days$ jours",
+        "placeholders": {
+            "days": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "favorites": {
+        "message": "Favoris"
+    },
+
+    "favoriteButton": {
+        "message": "Joueurs favoris"
+    },
+
+    "favoritePlayers": {
+        "message": "Joueurs favoris"
+    },
+
+    "addToFavorites": {
+        "message": "Ajouter aux favoris"
+    },
+
+    "removeFromFavorites": {
+        "message": "Retirer des favoris"
+    },
+
+    "noFavoritePlayers": {
+        "message": "Vous n'avez aucun joueur favori"
+    },
+
+    "addFirstFavorite": {
+        "message": "Trouvez un joueur et ajoutez-le aux favoris"
+    },
+
+    "viewPlayerStats": {
+        "message": "Voir les statistiques"
+    },
+
+    "removeFromFavoritesList": {
+        "message": "Retirer de la liste"
+    },
+
+    "backToSearch": {
+        "message": "Retour à la recherche"
+    },
+
+    "favoritesSaved": {
+        "message": "Ajouté aux favoris"
+    },
+
+    "favoritesRemoved": {
+        "message": "Retiré des favoris"
+    },
+
+    "faceitUrl": {
+        "message": "URL FACEIT"
+    },
+
+    "openInFaceit": {
+        "message": "Ouvrir dans FACEIT"
     }
 }

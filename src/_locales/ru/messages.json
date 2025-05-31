@@ -387,5 +387,13 @@
 
     "favoritesRemoved": {
         "message": "Удалено из избранного"
+    },
+
+    "faceitUrl": {
+        "message": "FACEIT URL"
+    },
+
+    "openInFaceit": {
+        "message": "Открыть в FACEIT"
     }
 }

@@ -276,5 +276,125 @@
 
     "favoritesRemoved": {
         "message": "Removido dos favoritos"
+    },
+
+    "details": {
+        "message": "Detalhes"
+    },
+
+    "viewDetailedHistory": {
+        "message": "Ver histórico detalhado de partidas"
+    },
+
+    "win": {
+        "message": "Vitória"
+    },
+
+    "loss": {
+        "message": "Derrota"
+    },
+
+    "losses": {
+        "message": "Derrotas"
+    },
+
+    "lastGame": {
+        "message": "Última partida"
+    },
+
+    "gamesAgo": {
+        "message": "Há $count$ partidas",
+        "placeholders": {
+            "count": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "detailedMatchHistory": {
+        "message": "Histórico detalhado de partidas"
+    },
+
+    "matchHistory": {
+        "message": "Histórico"
+    },
+
+    "loadingMatches": {
+        "message": "Carregando partidas..."
+    },
+
+    "noMatchesFound": {
+        "message": "Nenhuma partida encontrada"
+    },
+
+    "loading": {
+        "message": "Carregando"
+    },
+
+    "loadMoreMatches": {
+        "message": "Carregar mais partidas"
+    },
+
+    "headshots": {
+        "message": "Headshots"
+    },
+
+    "showDetails": {
+        "message": "Mostrar detalhes"
+    },
+
+    "hideDetails": {
+        "message": "Ocultar detalhes"
+    },
+
+    "matchId": {
+        "message": "ID da partida"
+    },
+
+    "duration": {
+        "message": "Duração"
+    },
+
+    "justNow": {
+        "message": "Agora mesmo"
+    },
+
+    "minutesAgo": {
+        "message": "Há $minutes$ minutos",
+        "placeholders": {
+            "minutes": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "hoursAgo": {
+        "message": "Há $hours$ horas",
+        "placeholders": {
+            "hours": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "yesterday": {
+        "message": "Ontem"
+    },
+
+    "daysAgo": {
+        "message": "Há $days$ dias",
+        "placeholders": {
+            "days": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "faceitUrl": {
+        "message": "URL do FACEIT"
+    },
+
+    "openInFaceit": {
+        "message": "Abrir no FACEIT"
     }
 }

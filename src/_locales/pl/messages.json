@@ -276,5 +276,125 @@
 
     "favoritesRemoved": {
         "message": "Usunięto z ulubionych"
+    },
+
+    "details": {
+        "message": "Szczegóły"
+    },
+
+    "viewDetailedHistory": {
+        "message": "Zobacz szczegółową historię meczów"
+    },
+
+    "win": {
+        "message": "Wygrana"
+    },
+
+    "loss": {
+        "message": "Przegrana"
+    },
+
+    "losses": {
+        "message": "Przegrane"
+    },
+
+    "lastGame": {
+        "message": "Ostatni mecz"
+    },
+
+    "gamesAgo": {
+        "message": "$count$ meczów temu",
+        "placeholders": {
+            "count": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "detailedMatchHistory": {
+        "message": "Szczegółowa historia meczów"
+    },
+
+    "matchHistory": {
+        "message": "Historia"
+    },
+
+    "loadingMatches": {
+        "message": "Ładowanie meczów..."
+    },
+
+    "noMatchesFound": {
+        "message": "Nie znaleziono meczów"
+    },
+
+    "loading": {
+        "message": "Ładowanie"
+    },
+
+    "loadMoreMatches": {
+        "message": "Załaduj więcej meczów"
+    },
+
+    "headshots": {
+        "message": "Headshoty"
+    },
+
+    "showDetails": {
+        "message": "Pokaż szczegóły"
+    },
+
+    "hideDetails": {
+        "message": "Ukryj szczegóły"
+    },
+
+    "matchId": {
+        "message": "ID meczu"
+    },
+
+    "duration": {
+        "message": "Czas trwania"
+    },
+
+    "justNow": {
+        "message": "Przed chwilą"
+    },
+
+    "minutesAgo": {
+        "message": "$minutes$ minut temu",
+        "placeholders": {
+            "minutes": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "hoursAgo": {
+        "message": "$hours$ godzin temu",
+        "placeholders": {
+            "hours": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "yesterday": {
+        "message": "Wczoraj"
+    },
+
+    "daysAgo": {
+        "message": "$days$ dni temu",
+        "placeholders": {
+            "days": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "faceitUrl": {
+        "message": "URL FACEIT"
+    },
+
+    "openInFaceit": {
+        "message": "Otwórz w FACEIT"
     }
 }

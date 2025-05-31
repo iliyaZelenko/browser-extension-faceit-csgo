@@ -388,5 +388,13 @@
 
     "favoritesRemoved": {
         "message": "Removed from favorites"
+    },
+
+    "faceitUrl": {
+        "message": "FACEIT URL"
+    },
+
+    "openInFaceit": {
+        "message": "Open in FACEIT"
     }
 }
