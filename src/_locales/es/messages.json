@@ -396,5 +396,17 @@
 
     "openInFaceit": {
         "message": "Abrir en FACEIT"
+    },
+
+    "competition": {
+        "message": "Competición"
+    },
+
+    "region": {
+        "message": "Región"
+    },
+
+    "gameMode": {
+        "message": "Modo de juego"
     }
 }

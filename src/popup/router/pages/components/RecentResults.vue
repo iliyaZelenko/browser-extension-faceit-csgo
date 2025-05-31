@@ -2,12 +2,12 @@
   <div class="recent-results">
     <div class="results-container">
       <div class="results-grid">
+        <!-- @click="goToMatch(i)" -->
         <div
           v-for="(result, i) in results"
           :key="'result-' + i"
           :class="['result-item', resultClass(result)]"
           :title="resultTooltip(result, i)"
-          @click="goToMatch(i)"
         >
           {{ resultText(result) }}
         </div>

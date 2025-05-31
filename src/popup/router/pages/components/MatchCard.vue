@@ -8,51 +8,45 @@
       </div>
       
       <div class="match-info">
-        <div class="map-name">
-          <i class="fas fa-map"></i>
-          {{ formatMapName((match.voting && match.voting.map && match.voting.map.pick) || match.map || 'Unknown') }}
-        </div>
         <div class="match-date">
           <i class="fas fa-calendar"></i>
           {{ formatDate(match.finished_at) }}
         </div>
-      </div>
-      
-      <div class="match-score">
-        <span class="score">{{ getScoreDisplay() }}</span>
+        <div v-if="match.started_at" class="match-start-time">
+          <i class="fas fa-clock"></i>
+          {{ formatStartTime(match.started_at) }}
+        </div>
+        <div v-if="matchDuration" class="match-duration">
+          <i class="fas fa-stopwatch"></i>
+          {{ matchDuration }}
+        </div>
+        <div v-if="match.competition_name" class="competition">
+          <i class="fas fa-trophy"></i>
+          {{ match.competition_name }}
+        </div>
+        <div v-if="match.region" class="region">
+          <i class="fas fa-globe"></i>
+          {{ match.region }}
+        </div>
+        <div v-if="match.game_mode" class="game-mode">
+          <i class="fas fa-gamepad"></i>
+          {{ match.game_mode }}
+        </div>
+        <div class="match-id">
+          <i class="fas fa-hashtag"></i>
+          {{ match.match_id }}
+        </div>
+        <div v-if="faceitUrl" class="faceit-link">
+          <i class="fas fa-external-link-alt"></i>
+          <a :href="faceitUrl" target="_blank">
+            {{ $browser.i18n.getMessage('openInFaceit') || 'Open in FACEIT' }}
+          </a>
+        </div>
       </div>
     </div>
     
     <div class="match-details">
       <!-- Убираем блок статистики игрока, так как это фейковые данные -->
-    </div>
-    
-    <!-- Additional details toggle -->
-    <div class="match-footer">
-      <button 
-        @click="toggleDetails"
-        class="toggle-details"
-        :class="{ active: showExtraDetails }"
-      >
-        <i :class="['fas', showExtraDetails ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
-        {{ showExtraDetails ? $browser.i18n.getMessage('hideDetails') : $browser.i18n.getMessage('showDetails') }}
-      </button>
-    </div>
-    
-    <!-- Extended details -->
-    <div v-if="showExtraDetails" class="extended-details">
-      <div class="detail-row">
-        <span class="detail-label">{{ $browser.i18n.getMessage('matchId') }}:</span>
-        <span class="detail-value">{{ match.match_id }}</span>
-      </div>
-      <div v-if="faceitUrl" class="detail-row">
-        <span class="detail-label">{{ $browser.i18n.getMessage('faceitUrl') || 'FACEIT URL' }}:</span>
-        <span class="detail-value">
-          <a :href="faceitUrl" target="_blank" style="color: #f50;">
-            {{ $browser.i18n.getMessage('openInFaceit') || 'Open in FACEIT' }}
-          </a>
-        </span>
-      </div>
     </div>
   </div>
 </template>
@@ -73,29 +67,38 @@ export default {
       default: false
     }
   },
-  data() {
-    return {
-      showExtraDetails: false
-    }
-  },
   computed: {
     resultClass() {
-      // Для FACEIT API History определяем результат через команды
+      // Определяем результат через winner и команды
       const playerTeam = this.findPlayerTeam()
       if (playerTeam && this.match.results && this.match.results.winner) {
         return this.match.results.winner === playerTeam.factionId ? 'win' : 'loss'
       }
-      
-      // Fallback на mock данные
-      return +this.match.result ? 'win' : 'loss'
+      return 'unknown'
     },
     resultText() {
-      return this.resultClass === 'win' ? 'WIN' : 'LOSS'
+      if (this.resultClass === 'win') return this.$browser.i18n.getMessage('win') || 'WIN'
+      if (this.resultClass === 'loss') return this.$browser.i18n.getMessage('loss') || 'LOSS'
+      return 'N/A'
     },
     faceitUrl() {
       // Обрабатываем FACEIT URL, заменяя {lang} на 'en'
       if (this.match.faceit_url) {
         return this.match.faceit_url.replace('{lang}', 'en')
+      }
+      return null
+    },
+    matchDuration() {
+      if (this.match.finished_at && this.match.started_at) {
+        const durationInSeconds = this.match.finished_at - this.match.started_at
+        const hours = Math.floor(durationInSeconds / 3600)
+        const minutes = Math.floor((durationInSeconds % 3600) / 60)
+        
+        if (hours > 0) {
+          return `${hours}h ${minutes}m`
+        } else {
+          return `${minutes}m`
+        }
       }
       return null
     }
@@ -111,10 +114,6 @@ export default {
         }
       }
       return null
-    },
-    formatMapName(mapName) {
-      // Remove 'de_' prefix and capitalize
-      return mapName.replace('de_', '').charAt(0).toUpperCase() + mapName.replace('de_', '').slice(1)
     },
     formatDate(dateString) {
       // FACEIT API использует finished_at timestamp в секундах (Unix timestamp)
@@ -141,15 +140,10 @@ export default {
         }
       }
     },
-    toggleDetails() {
-      this.showExtraDetails = !this.showExtraDetails
-    },
-    getScoreDisplay() {
-      if (this.match.results && this.match.results.score) {
-        const scores = Object.values(this.match.results.score)
-        return scores.join(' : ')
-      }
-      return this.match.score ? `${this.match.score.faction1} : ${this.match.score.faction2}` : 'N/A'
+    formatStartTime(timestamp) {
+      // FACEIT API использует started_at timestamp в секундах (Unix timestamp)
+      const date = new Date(timestamp * 1000) // Конвертируем секунды в миллисекунды
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   },
   
@@ -217,7 +211,7 @@ export default {
 
 .match-header {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   gap: 15px;
   align-items: center;
   margin-bottom: 12px;
@@ -254,86 +248,76 @@ export default {
   gap: 4px;
   color: #ccc;
   
-  .map-name, .match-date {
+  .match-date {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     font-size: 0.9rem;
     
     i {
       color: #f50;
-      width: 12px;
+      width: 14px;
     }
   }
   
-  .map-name {
-    font-weight: bold;
-    color: white;
+  .match-start-time {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    
+    i {
+      color: #f50;
+      width: 14px;
+    }
   }
-}
-
-.match-score {
-  .score {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #f50;
+  
+  .match-duration {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    
+    i {
+      color: #f50;
+      width: 14px;
+    }
+  }
+  
+  .competition, .region, .game-mode, .match-id, .faceit-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    
+    i {
+      color: #f50;
+      width: 14px;
+    }
+  }
+  
+  .faceit-link {
+    a {
+      color: #f50;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      
+      &:hover {
+        color: #ff6b35;
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  .match-id {
+    color: #999;
+    font-size: 0.8rem;
   }
 }
 
 .match-details {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 12px;
-}
-
-.match-footer {
-  margin-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 8px;
-  text-align: center;
-}
-
-.toggle-details {
-  background: none;
-  border: none;
-  color: #ccc;
-  font-size: 0.8rem;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    color: #f50;
-    background: rgba(245, 85, 0, 0.1);
-  }
-  
-  i {
-    margin-right: 4px;
-  }
-}
-
-.extended-details {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 0;
-  
-  .detail-label {
-    color: #999;
-    font-size: 0.8rem;
-  }
-  
-  .detail-value {
-    color: white;
-    font-size: 0.8rem;
-    font-weight: bold;
-  }
 }
 
 // Responsive design

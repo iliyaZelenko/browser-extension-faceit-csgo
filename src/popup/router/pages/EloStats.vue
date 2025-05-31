@@ -97,11 +97,24 @@
         </span>
       </p>
 
-      <div>
+      <!-- <div>
         <RecentResults
           :results="fullStats.lifetime['Recent Results']"
           @go-to-match="goToSpecificMatch"
         />
+      </div>
+       -->
+      <!-- W/L кружки для последних матчей -->
+      <div v-if="recentMatches.length > 0" class="recent-wl-circles">
+        <div 
+          v-for="(match, index) in recentMatches" 
+          :key="match.match_id"
+          :class="['wl-circle', getMatchResult(match)]"
+          :title="getMatchResultText(match)"
+          @click="goToSpecificMatch(index)"
+        >
+          {{ getMatchResultLetter(match) }}
+        </div>
       </div>
     </div>
 
@@ -128,6 +141,7 @@
 import EmptyState from './components/EmptyState.vue'
 import RecentResults from './components/RecentResults.vue'
 import FavoriteButton from './components/FavoriteButton.vue'
+import { FACEIT_API, GAMES, API_LIMITS } from '../../utils/constants.js'
 
 export default {
   components: {
@@ -158,6 +172,8 @@ export default {
 
     return {
       maxElo,
+      matches: [],
+      loadingMatches: false,
       lvls: [
         { range: [1, 800], label: '1' },
         { range: [801, 950], label: '2' },
@@ -205,6 +221,19 @@ export default {
     },
     currentLvlNextLvlStart () {
       return this.lvls[this.currentLvlIndex + 1].range[0]
+    },
+    recentMatches() {
+      return this.matches.slice(0, 5)
+    }
+  },
+  watch: {
+    player: {
+      handler(newPlayer, oldPlayer) {
+        if (newPlayer?.player_id && newPlayer.player_id !== oldPlayer?.player_id) {
+          this.loadMatches()
+        }
+      },
+      immediate: true
     }
   },
   methods: {
@@ -231,6 +260,55 @@ export default {
         name: 'match-history', 
         query: { highlight: matchIndex } 
       })
+    },
+    async loadMatches() {
+      this.loadingMatches = true
+      try {
+        const response = await fetch(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/history?game=${GAMES.CSGO}&offset=0&limit=5`, {
+          headers: FACEIT_API.HEADERS
+        })
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        const data = await response.json()
+        this.matches = data.items || []
+      } catch (error) {
+        console.error('Error loading matches:', error)
+        this.matches = []
+      } finally {
+        this.loadingMatches = false
+      }
+    },
+    getMatchResult(match) {
+      const playerTeam = this.findPlayerTeam(match)
+      if (playerTeam && match.results && match.results.winner) {
+        return match.results.winner === playerTeam.factionId ? 'win' : 'loss'
+      }
+      return 'unknown'
+    },
+    getMatchResultText(match) {
+      const result = this.getMatchResult(match)
+      if (result === 'win') return this.$browser.i18n.getMessage('win') || 'Win'
+      if (result === 'loss') return this.$browser.i18n.getMessage('loss') || 'Loss'
+      return 'N/A'
+    },
+    getMatchResultLetter(match) {
+      const result = this.getMatchResult(match)
+      if (result === 'win') return 'W'
+      if (result === 'loss') return 'L'
+      return 'N/A'
+    },
+    findPlayerTeam(match) {
+      if (!match.teams) return null
+      
+      for (const [factionId, team] of Object.entries(match.teams)) {
+        if (team.players && team.players.some(player => player.player_id === this.player.player_id)) {
+          return { factionId: factionId, ...team }
+        }
+      }
+      return null
     }
   }
 }
@@ -350,9 +428,52 @@ export default {
   }
 
   .checkbox-label {
-    margin-left: 10px;
+    margin-left: 8px;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .recent-wl-circles {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+  }
+
+  .wl-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+
+  .wl-circle.win {
+    background: linear-gradient(135deg, #4caf50, #45a049);
     color: white;
-    line-height: 1.2;
+    border-color: #4caf50;
+  }
+
+  .wl-circle.loss {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    border-color: #f44336;
+  }
+  
+  .wl-circle.unknown {
+    background: linear-gradient(135deg, #666, #555);
+    color: white;
+    border-color: #666;
+  }
+
+  .wl-circle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 </style>
 

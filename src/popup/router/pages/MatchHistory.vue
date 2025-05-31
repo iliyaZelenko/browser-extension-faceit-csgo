@@ -3,11 +3,18 @@
     <!-- Recent Results Summary -->
     <div class="results-summary">
       <h3>{{ $browser.i18n.getMessage('recentResults') }}</h3>
-      <div class="results-overview">
-        <RecentResults
-          :results="fullStats.lifetime['Recent Results']"
-          :show-details-button="false"
-        />
+      
+      <!-- W/L кружки для последних матчей -->
+      <div v-if="recentMatches.length > 0" class="recent-wl-circles">
+        <div 
+          v-for="(match, index) in recentMatches" 
+          :key="match.match_id"
+          :class="['wl-circle', getMatchResult(match)]"
+          :title="getMatchResultText(match)"
+          @click="goToSpecificMatch(index)"
+        >
+          {{ getMatchResultLetter(match) }}
+        </div>
       </div>
     </div>
 
@@ -95,6 +102,9 @@ export default {
   computed: {
     recentResults() {
       return this.fullStats?.lifetime?.['Recent Results'] || []
+    },
+    recentMatches() {
+      return this.matches.slice(0, 5)
     }
   },
   async mounted() {
@@ -143,8 +153,7 @@ export default {
         this.matches = data.items || []
       } catch (error) {
         console.error('Error loading matches:', error)
-        // Fallback to mock data if API fails
-        this.matches = this.generateMockMatches()
+        this.matches = []
       } finally {
         this.loadingMatches = false
       }
@@ -166,39 +175,61 @@ export default {
         this.matches.push(...moreMatches)
       } catch (error) {
         console.error('Error loading more matches:', error)
-        // Fallback to mock data if API fails
-        const moreMatches = this.generateMockMatches()
-        this.matches.push(...moreMatches)
+        // Если ошибка загрузки, просто не добавляем новые матчи
       } finally {
         this.loadingMore = false
       }
     },
-    generateMockMatches() {
-      // Mock data generator for development
-      const maps = ['de_dust2', 'de_mirage', 'de_inferno', 'de_cache', 'de_overpass']
-      const results = ['1', '0']
-      
-      return Array.from({ length: this.limit }, (_, i) => ({
-        match_id: `match_${Date.now()}_${i}`,
-        finished_at: new Date(Date.now() - (i * 24 * 60 * 60 * 1000)).toISOString(),
-        map: maps[Math.floor(Math.random() * maps.length)],
-        result: results[Math.floor(Math.random() * results.length)],
-        score: {
-          faction1: Math.floor(Math.random() * 16) + 1,
-          faction2: Math.floor(Math.random() * 16) + 1
-        },
-        stats: {
-          kills: Math.floor(Math.random() * 30) + 5,
-          deaths: Math.floor(Math.random() * 25) + 5,
-          assists: Math.floor(Math.random() * 15) + 2,
-          headshots: Math.floor(Math.random() * 20) + 2,
-          mvps: Math.floor(Math.random() * 5)
-        },
-        elo_change: Math.floor(Math.random() * 50) - 25
-      }))
-    },
     clearHighlight() {
       this.highlightedMatchIndex = null
+    },
+    getMatchResult(match) {
+      const playerTeam = this.findPlayerTeam(match)
+      if (playerTeam && match.results && match.results.winner) {
+        return match.results.winner === playerTeam.factionId ? 'win' : 'loss'
+      }
+      return 'unknown'
+    },
+    getMatchResultText(match) {
+      const result = this.getMatchResult(match)
+      if (result === 'win') return this.$browser.i18n.getMessage('win') || 'Win'
+      if (result === 'loss') return this.$browser.i18n.getMessage('loss') || 'Loss'
+      return 'N/A'
+    },
+    getMatchResultLetter(match) {
+      const result = this.getMatchResult(match)
+      if (result === 'win') return 'W'
+      if (result === 'loss') return 'L'
+      return 'N/A'
+    },
+    goToSpecificMatch(index) {
+      this.highlightedMatchIndex = index
+      
+      // Убираем подсветку через 3 секунды
+      setTimeout(() => {
+        this.highlightedMatchIndex = null
+      }, 3000)
+      
+      // Прокручиваем к выделенному матчу
+      this.$nextTick(() => {
+        const matchCards = document.querySelectorAll('.match-card')
+        if (matchCards[index]) {
+          matchCards[index].scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          })
+        }
+      })
+    },
+    findPlayerTeam(match) {
+      if (!match.teams) return null
+      
+      for (const [factionId, team] of Object.entries(match.teams)) {
+        if (team.players && team.players.some(player => player.player_id === this.player.player_id)) {
+          return { factionId: factionId, ...team }
+        }
+      }
+      return null
     }
   }
 }
@@ -245,9 +276,48 @@ export default {
   }
 }
 
-.results-overview {
+.recent-wl-circles {
   display: flex;
   justify-content: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.wl-circle {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+
+  &.win {
+    background: linear-gradient(135deg, #4caf50, #45a049);
+    color: white;
+    border-color: #4caf50;
+  }
+
+  &.loss {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    border-color: #f44336;
+  }
+  
+  &.unknown {
+    background: linear-gradient(135deg, #666, #555);
+    color: white;
+    border-color: #666;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
 }
 
 .match-history {
