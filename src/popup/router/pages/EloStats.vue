@@ -165,6 +165,10 @@ export default {
     localStorageNickname: {
       type: String,
       default: null
+    },
+    selectedGame: {
+      type: String,
+      default: 'csgo'
     }
   },
   data () {
@@ -196,7 +200,7 @@ export default {
       return this.player.faceit_url.replace(/{lang}/, 'en')
     },
     csgoStats () {
-      return this.player.games.csgo
+      return this.player.games[this.selectedGame] || this.player.games.csgo
     },
     currentLvl () {
       // faceit может иметь 0 эло
@@ -234,6 +238,13 @@ export default {
         }
       },
       immediate: true
+    },
+    selectedGame: {
+      handler(newGame, oldGame) {
+        if (newGame !== oldGame && this.player?.player_id) {
+          this.loadMatches()
+        }
+      }
     }
   },
   methods: {
@@ -264,7 +275,7 @@ export default {
     async loadMatches() {
       this.loadingMatches = true
       try {
-        const response = await fetch(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/history?game=${GAMES.CSGO}&offset=0&limit=5`, {
+        const response = await fetch(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/history?game=${this.selectedGame}&offset=0&limit=5`, {
           headers: FACEIT_API.HEADERS
         })
         

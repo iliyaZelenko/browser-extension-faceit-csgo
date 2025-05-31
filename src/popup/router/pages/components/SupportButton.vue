@@ -19,24 +19,20 @@ export default {
 
 <style lang="scss" scoped>
 .support-button {
-  position: fixed;
-  bottom: 15px;
-  right: 15px;
-  width: 45px;
-  height: 45px;
+  width: 35px;
+  height: 35px;
   background: linear-gradient(135deg, #0088cc, #00aaff);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 136, 204, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 136, 204, 0.3);
   transition: all 0.3s ease;
-  z-index: 1000;
   
   &:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 136, 204, 0.6);
+    box-shadow: 0 4px 12px rgba(0, 136, 204, 0.5);
   }
   
   &:active {
@@ -45,7 +41,7 @@ export default {
   
   i {
     color: white;
-    font-size: 20px;
+    font-size: 16px;
   }
 }
 

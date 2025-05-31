@@ -87,6 +87,10 @@ export default {
     nickname: {
       type: String,
       default: null
+    },
+    selectedGame: {
+      type: String,
+      default: 'csgo'
     }
   },
   data() {
@@ -105,6 +109,16 @@ export default {
     },
     recentMatches() {
       return this.matches.slice(0, 5)
+    }
+  },
+  watch: {
+    selectedGame: {
+      handler(newGame, oldGame) {
+        if (newGame !== oldGame && this.player?.player_id) {
+          this.offset = 0 // Сбрасываем offset при смене игры
+          this.loadMatches()
+        }
+      }
     }
   },
   async mounted() {
@@ -141,7 +155,7 @@ export default {
     async loadMatches() {
       this.loadingMatches = true
       try {
-        const response = await fetch(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/history?game=${GAMES.CSGO}&offset=${this.offset}&limit=${this.limit}`, {
+        const response = await fetch(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/history?game=${this.selectedGame}&offset=${this.offset}&limit=${this.limit}`, {
           headers: FACEIT_API.HEADERS
         })
         
@@ -162,7 +176,7 @@ export default {
       this.loadingMore = true
       this.offset += this.limit
       try {
-        const response = await fetch(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/history?game=${GAMES.CSGO}&offset=${this.offset}&limit=${this.limit}`, {
+        const response = await fetch(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/history?game=${this.selectedGame}&offset=${this.offset}&limit=${this.limit}`, {
           headers: FACEIT_API.HEADERS
         })
         

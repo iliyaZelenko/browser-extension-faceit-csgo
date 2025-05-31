@@ -10,17 +10,26 @@
     <div style="width: 100%; height: 60px; background: red;"></div>
 
     <div style="padding: 8px;">
-      <div style="display: flex; justify-content: center; align-items: center; gap: 8px;">
-        <!--
-        <input
-          v-model="nickname"
-          type="text"
-          style="padding-left: 5px;"
-          @keyup.enter="findPlayer"
-        >-->
+      <!-- Хедер с элементами управления -->
+      <div class="header-controls">
+        <!-- Селектор игры -->
+        <GameSelector @game-selected="onGameSelected" />
+        
+        <!-- Кнопки справа -->
+        <div class="right-buttons">
+          <!-- Кнопка избранных игроков -->
+          <FavoritesListButton />
+          
+          <!-- Кнопка поддержки -->
+          <SupportButton />
+        </div>
+      </div>
 
-        <!--@keyup.enter="findPlayer"-->
-
+      <!-- Поле ввода игрока (скрывается на странице "Избранные игроки") -->
+      <div 
+        v-if="$route.name !== 'favorites'"
+        style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px;"
+      >
         <cool-select
           v-model="nickname"
           :items="players"
@@ -70,9 +79,6 @@
             </div>
           </template>
         </cool-select>
-        
-        <!-- Кнопка избранных игроков -->
-        <FavoritesListButton />
       </div>
 
       <!-- Табы (скрываются на странице "Избранные игроки") -->
@@ -87,6 +93,7 @@
         :nickname="nickname"
         :full-stats="fullStats"
         :local-storage-nickname="localStorageNickname"
+        :selected-game="selectedGame"
         @profile-error="onProfileError"
         @set-local-storage-nickname="setLocalStorageNickname"
       />
@@ -99,19 +106,25 @@
 import { CoolSelect } from 'vue-cool-select'
 import AnimatedTabs from './components/AnimatedTabs.vue'
 import FavoritesListButton from './components/FavoritesListButton.vue'
+import GameSelector from './components/GameSelector.vue'
+import SupportButton from './components/SupportButton.vue'
 import { FACEIT_API, GAMES } from '../../utils/constants.js'
 
 export default {
   components: { 
     CoolSelect, 
     AnimatedTabs,
-    FavoritesListButton
+    FavoritesListButton,
+    GameSelector,
+    SupportButton
   },
   data () {
     const storageNickname = localStorage.getItem('nickname')
+    // Проверяем что значение не равно строке 'null' или null
+    const validNickname = storageNickname && storageNickname !== 'null' ? storageNickname : null
 
     return {
-      nickname: storageNickname,
+      nickname: validNickname,
       players: [],
       player: null,
       fullStats: null,
@@ -121,7 +134,8 @@ export default {
       noData: false,
       API_HEADERS: FACEIT_API.HEADERS,
       defaultAvatar: 'https://cdn-frontend.faceit.com/web/54-1542827848/static/media/avatar_default_user_300x300.8befe042.jpg',
-      localStorageNicknameData: storageNickname
+      localStorageNicknameData: validNickname,
+      selectedGame: localStorage.getItem('selectedGame') || GAMES.CSGO
     }
   },
   computed: {
@@ -132,7 +146,11 @@ export default {
       set (nickname) {
         this.localStorageNicknameData = nickname
 
-        localStorage.setItem('nickname', nickname)
+        if (nickname === null) {
+          localStorage.removeItem('nickname')
+        } else {
+          localStorage.setItem('nickname', nickname)
+        }
       }
     },
     backgroundImage () {
@@ -184,6 +202,15 @@ export default {
     setLocalStorageNickname (val) {
       this.localStorageNickname = val
     },
+    onGameSelected(game) {
+      const previousGame = this.selectedGame
+      this.selectedGame = game
+      
+      // Если игра изменилась и есть выбранный игрок, перезагружаем данные
+      if (previousGame !== game && this.player) {
+        this.findPlayer()
+      }
+    },
     async findPlayer ({ nickname = this.nickname } = {}) {
       this.player = this.fullStats = null
 
@@ -210,7 +237,7 @@ export default {
       this.loading = true
 
       try {
-        this.player = await this.$get(`${FACEIT_API.BASE_URL}/players?nickname=${this.nickname}&game=${GAMES.CSGO}`, {
+        this.player = await this.$get(`${FACEIT_API.BASE_URL}/players?nickname=${this.nickname}&game=${this.selectedGame}`, {
           headers: this.API_HEADERS
         })
       } catch (e) {
@@ -235,7 +262,7 @@ export default {
       // gets all statistics
       if (this.player) {
         try {
-          this.fullStats = await this.$get(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/stats/${GAMES.CSGO}`, {
+          this.fullStats = await this.$get(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/stats/${this.selectedGame}`, {
             headers: this.API_HEADERS
           })
         } catch (e) {
@@ -270,7 +297,7 @@ export default {
       clearTimeout(this.searchTimeoutId)
       this.searchTimeoutId = setTimeout(async () => {
         try {
-          const { items } = await this.$get(`${FACEIT_API.BASE_URL}/search/players?nickname=${search}&game=${GAMES.CSGO}&offset=0&limit=` + playersLimit, {
+          const { items } = await this.$get(`${FACEIT_API.BASE_URL}/search/players?nickname=${search}&game=${this.selectedGame}&offset=0&limit=` + playersLimit, {
             headers: this.API_HEADERS
           })
 
@@ -290,7 +317,7 @@ export default {
       // this.players = []
     },
     getPlayerSearchLvl (playerSearch) {
-      return playerSearch.games.find(i => i.name === 'csgo').skill_level
+      return playerSearch.games.find(i => i.name === this.selectedGame).skill_level
     },
     avatarOrDefault (avatar) {
       if (!avatar || avatar === 'https://d50m6q67g4bn3.cloudfront.net/avatars/084a317c-6346-4dde-ab85-744f469fc217_1464715706995') {
@@ -324,6 +351,23 @@ export default {
     background-size: cover;
 
     z-index: -1;
+  }
+
+  .header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    border: 1px solid rgba(245, 85, 0, 0.3);
+    margin-bottom: 10px;
+  }
+
+  .right-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 </style>
 
