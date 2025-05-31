@@ -9,7 +9,7 @@ export default {
   name: 'SupportButton',
   methods: {
     openTelegram() {
-      browser.tabs.create({
+      this.$browser.tabs.create({
         url: 'https://t.me/+kywMwGjayds3Nzc6'
       })
     }

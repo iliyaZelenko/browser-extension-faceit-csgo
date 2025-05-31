@@ -107,15 +107,11 @@
 <script>
 import { CoolSelect } from 'vue-cool-select'
 import AnimatedTabs from './components/AnimatedTabs.vue'
+import { FACEIT_API, GAMES } from '../../utils/constants.js'
 
 export default {
   components: { CoolSelect, AnimatedTabs },
   data () {
-    const TOKEN = 'Bearer 8c142d35-ba07-4de6-a14a-9f1e3e6109e8'
-    const API_HEADERS = {
-      accept: 'application/json',
-      Authorization: TOKEN
-    }
     const storageNickname = localStorage.getItem('nickname')
 
     return {
@@ -127,7 +123,7 @@ export default {
       searchTimeoutId: null,
       searchLettersLimit: 2,
       noData: false,
-      API_HEADERS: API_HEADERS,
+      API_HEADERS: FACEIT_API.HEADERS,
       defaultAvatar: 'https://cdn-frontend.faceit.com/web/54-1542827848/static/media/avatar_default_user_300x300.8befe042.jpg',
       localStorageNicknameData: storageNickname
     }
@@ -159,18 +155,17 @@ export default {
         {
           name: 'index',
           to: { name: 'index' },
-          icon: 'fas fa-chart-line',
-          label: (this.$browser && this.$browser.i18n && this.$browser.i18n.getMessage) 
-            ? this.$browser.i18n.getMessage('showEloStats') 
-            : 'Elo'
+          icon: 'fas fa-chart-line'
         },
         {
           name: 'full-stats',
           to: { name: 'full-stats' },
-          icon: 'fas fa-chart-bar',
-          label: (this.$browser && this.$browser.i18n && this.$browser.i18n.getMessage) 
-            ? this.$browser.i18n.getMessage('showFullStats') 
-            : 'Full'
+          icon: 'fas fa-chart-bar'
+        },
+        {
+          name: 'match-history',
+          to: { name: 'match-history' },
+          icon: 'fas fa-history'
         }
       ]
     }
@@ -192,9 +187,9 @@ export default {
       this.nickname = nickname
 
       if (this.nickname.length < 3) {
-        browser.notifications.create({
+        this.$browser.notifications.create({
           type: 'basic',
-          iconUrl: browser.runtime.getURL('icons/page-48.png'),
+          iconUrl: this.$browser.runtime.getURL('icons/page-48.png'),
           title: 'Nickname must be at least 2 characters.',
           message: ''
         })
@@ -212,14 +207,14 @@ export default {
       this.loading = true
 
       try {
-        this.player = await this.$get(`https://open.faceit.com/data/v4/players?nickname=${this.nickname}&game=csgo`, {
+        this.player = await this.$get(`${FACEIT_API.BASE_URL}/players?nickname=${this.nickname}&game=${GAMES.CSGO}`, {
           headers: this.API_HEADERS
         })
       } catch (e) {
         if (e.response.status === 404) {
-          browser.notifications.create({
+          this.$browser.notifications.create({
             'type': 'basic',
-            'iconUrl': browser.runtime.getURL('icons/icon_48.png'),
+            'iconUrl': this.$browser.runtime.getURL('icons/icon_48.png'),
             'title': 'Player not found.',
             'message': `Nickname ${this.nickname} not found.`
           })
@@ -237,14 +232,14 @@ export default {
       // gets all statistics
       if (this.player) {
         try {
-          this.fullStats = await this.$get(`https://open.faceit.com/data/v4/players/${this.player.player_id}/stats/csgo`, {
+          this.fullStats = await this.$get(`${FACEIT_API.BASE_URL}/players/${this.player.player_id}/stats/${GAMES.CSGO}`, {
             headers: this.API_HEADERS
           })
         } catch (e) {
           if (e.response.status === 404) {
-            browser.notifications.create({
+            this.$browser.notifications.create({
               'type': 'basic',
-              'iconUrl': browser.runtime.getURL('icons/icon_48.png'),
+              'iconUrl': this.$browser.runtime.getURL('icons/icon_48.png'),
               'title': 'Error from server.',
               'message': e.response.data.errors[0].message
             })
@@ -272,7 +267,7 @@ export default {
       clearTimeout(this.searchTimeoutId)
       this.searchTimeoutId = setTimeout(async () => {
         try {
-          const { items } = await this.$get(`https://open.faceit.com/data/v4/search/players?nickname=${search}&game=csgo&offset=0&limit=` + playersLimit, {
+          const { items } = await this.$get(`${FACEIT_API.BASE_URL}/search/players?nickname=${search}&game=${GAMES.CSGO}&offset=0&limit=` + playersLimit, {
             headers: this.API_HEADERS
           })
 

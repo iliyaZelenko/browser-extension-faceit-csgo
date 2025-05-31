@@ -20,7 +20,8 @@
         "page": "options/options.html"
     },
     "permissions": [
-        "notifications"
+        "notifications",
+        "tabs"
     ],
     "host_permissions": [
         "https://open.faceit.com/"

@@ -19,7 +19,6 @@
         exact
       >
         <i :class="tab.icon"></i>
-        {{ tab.label }}
       </router-link>
     </div>
     
@@ -189,17 +188,19 @@ export default {
   position: relative;
   color: rgba(255, 255, 255, 0.7) !important;
   text-decoration: none;
-  padding: 12px 20px;
+  padding: 12px;
   border-radius: 6px;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   z-index: 2;
   cursor: pointer;
   border: 2px solid transparent;
+  min-width: 44px;
   
   &:hover {
     color: white !important;
@@ -243,8 +244,7 @@ export default {
   }
   
   i {
-    margin-right: 8px;
-    font-size: 1rem;
+    font-size: 1.1rem;
     transition: transform 0.3s ease;
   }
   

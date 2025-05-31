@@ -92,29 +92,26 @@
         </span>
       </p>
 
-      <p>
-        {{ $browser.i18n.getMessage('recentResults') }}
-        <span
-          v-for="(result, i) in fullStats.lifetime['Recent Results']"
-          :key="'last-result-' + i"
-        >
-          <span :class="(+result ? 'win-result' : 'lose-result') + '  result'">
-            {{ +result ? 'W' : 'L' }}
-          </span>
-        </span>
-      </p>
+      <div>
+        <RecentResults
+          :results="fullStats.lifetime['Recent Results']"
+          @go-to-match="goToSpecificMatch"
+        />
+      </div>
     </div>
 
     <div style="text-align: center; margin-top: 10px;">
-      <button @click="saveNickname">
-        {{ $browser.i18n.getMessage('showThisProfileAfterOpening') }}
-        <span
-          v-if="localStorageNickname === nickname"
-          style="color: darkgreen;"
+      <label class="save-profile-checkbox">
+        <input 
+          type="checkbox" 
+          :checked="localStorageNickname === nickname"
+          @change="toggleSaveProfile"
         >
-          {{ $browser.i18n.getMessage('saved') }}
+        <span class="checkmark"></span>
+        <span class="checkbox-label">
+          {{ $browser.i18n.getMessage('showThisProfileAfterOpening') }}
         </span>
-      </button>
+      </label>
     </div>
   </div>
   
@@ -124,10 +121,12 @@
 
 <script>
 import EmptyState from './components/EmptyState.vue'
+import RecentResults from './components/RecentResults.vue'
 
 export default {
   components: {
-    EmptyState
+    EmptyState,
+    RecentResults
   },
   props: {
     player: {
@@ -182,9 +181,9 @@ export default {
       const range = this.lvls.find(i => i.range[0] <= elo && elo <= i.range[1] && i.label === this.csgoStats.skill_level.toString())
 
       if (!range) {
-        browser.notifications.create({
+        this.$browser.notifications.create({
           'type': 'basic',
-          'iconUrl': browser.runtime.getURL('icons/icon_48.png'),
+          'iconUrl': this.$browser.runtime.getURL('icons/icon_48.png'),
           'title': 'Invalid profile.',
           'message': `This player has a mismatch of elo points (${elo} elo) to his lvl (${this.csgoStats.skill_level} lvl).`
         })
@@ -204,7 +203,7 @@ export default {
   methods: {
     openProfile () {
       // var creating =
-      browser.tabs.create({
+      this.$browser.tabs.create({
         url: this.profileUrl
       })
       // creating.then(onCreated, onError)
@@ -217,8 +216,14 @@ export default {
       //   console.log(`Error: ${error}`)
       // }
     },
-    saveNickname () {
-      this.$emit('set-local-storage-nickname', this.nickname)
+    toggleSaveProfile () {
+      this.$emit('set-local-storage-nickname', this.localStorageNickname === this.nickname ? null : this.nickname)
+    },
+    goToSpecificMatch(matchIndex) {
+      this.$router.push({ 
+        name: 'match-history', 
+        query: { highlight: matchIndex } 
+      })
     }
   }
 }
@@ -273,6 +278,74 @@ export default {
     background-color: #7cc4ff;
     display: inline-block;
     height: 100%;
+  }
+
+  .save-profile-checkbox {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .save-profile-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  .checkmark {
+    height: 20px;
+    width: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .save-profile-checkbox:hover input ~ .checkmark {
+    background-color: rgba(245, 85, 0, 0.2);
+    border-color: rgba(245, 85, 0, 0.6);
+  }
+
+  .save-profile-checkbox input:checked ~ .checkmark {
+    background-color: #f50;
+    border-color: #f50;
+  }
+
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  .save-profile-checkbox input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  .save-profile-checkbox .checkmark:after {
+    left: 6px;
+    top: 3px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+  .checkbox-label {
+    margin-left: 10px;
+    color: white;
+    line-height: 1.2;
   }
 </style>
 

@@ -227,5 +227,108 @@
 
     "overallStatistics": {
         "message": "Общая статистика"
+    },
+
+    "details": {
+        "message": "Подробнее"
+    },
+
+    "viewDetailedHistory": {
+        "message": "Посмотреть детальную историю матчей"
+    },
+
+    "win": {
+        "message": "Победа"
+    },
+
+    "loss": {
+        "message": "Поражение"
+    },
+
+    "losses": {
+        "message": "Поражения"
+    },
+
+    "lastGame": {
+        "message": "Последняя игра"
+    },
+
+    "gamesAgo": {
+        "message": "$count$ игр назад",
+        "placeholders": {
+            "count": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "detailedMatchHistory": {
+        "message": "Детальная история матчей"
+    },
+
+    "matchHistory": {
+        "message": "История"
+    },
+
+    "loadingMatches": {
+        "message": "Загрузка матчей..."
+    },
+
+    "noMatchesFound": {
+        "message": "Матчи не найдены"
+    },
+
+    "loading": {
+        "message": "Загрузка"
+    },
+
+    "loadMoreMatches": {
+        "message": "Загрузить больше матчей"
+    },
+
+    "headshots": {
+        "message": "Хедшоты"
+    },
+
+    "showDetails": {
+        "message": "Показать подробности"
+    },
+
+    "hideDetails": {
+        "message": "Скрыть подробности"
+    },
+
+    "matchId": {
+        "message": "ID матча"
+    },
+
+    "duration": {
+        "message": "Длительность"
+    },
+
+    "justNow": {
+        "message": "Только что"
+    },
+
+    "hoursAgo": {
+        "message": "$hours$ часов назад",
+        "placeholders": {
+            "hours": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "yesterday": {
+        "message": "Вчера"
+    },
+
+    "daysAgo": {
+        "message": "$days$ дней назад",
+        "placeholders": {
+            "days": {
+                "content": "$1"
+            }
+        }
     }
 }

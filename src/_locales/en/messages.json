@@ -228,5 +228,108 @@
 
     "overallStatistics": {
         "message": "Overall Statistics"
+    },
+
+    "details": {
+        "message": "Details"
+    },
+
+    "viewDetailedHistory": {
+        "message": "View detailed match history"
+    },
+
+    "win": {
+        "message": "Win"
+    },
+
+    "loss": {
+        "message": "Loss"
+    },
+
+    "losses": {
+        "message": "Losses"
+    },
+
+    "lastGame": {
+        "message": "Last game"
+    },
+
+    "gamesAgo": {
+        "message": "$count$ games ago",
+        "placeholders": {
+            "count": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "detailedMatchHistory": {
+        "message": "Detailed Match History"
+    },
+
+    "matchHistory": {
+        "message": "History"
+    },
+
+    "loadingMatches": {
+        "message": "Loading matches..."
+    },
+
+    "noMatchesFound": {
+        "message": "No matches found"
+    },
+
+    "loading": {
+        "message": "Loading"
+    },
+
+    "loadMoreMatches": {
+        "message": "Load more matches"
+    },
+
+    "headshots": {
+        "message": "Headshots"
+    },
+
+    "showDetails": {
+        "message": "Show details"
+    },
+
+    "hideDetails": {
+        "message": "Hide details"
+    },
+
+    "matchId": {
+        "message": "Match ID"
+    },
+
+    "duration": {
+        "message": "Duration"
+    },
+
+    "justNow": {
+        "message": "Just now"
+    },
+
+    "hoursAgo": {
+        "message": "$hours$ hours ago",
+        "placeholders": {
+            "hours": {
+                "content": "$1"
+            }
+        }
+    },
+
+    "yesterday": {
+        "message": "Yesterday"
+    },
+
+    "daysAgo": {
+        "message": "$days$ days ago",
+        "placeholders": {
+            "days": {
+                "content": "$1"
+            }
+        }
     }
 }
