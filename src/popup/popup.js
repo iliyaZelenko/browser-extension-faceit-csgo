@@ -60,6 +60,52 @@ window.addEventListener('error', event => {
     console.error('Unhandled JavaScript error:', event.error || event.message)
 })
 
+// Отслеживание сетевых ошибок через перехват fetch
+const originalFetch = window.fetch
+window.fetch = async function(...args) {
+    try {
+        const response = await originalFetch.apply(this, args)
+
+        // Отслеживаем неуспешные HTTP запросы
+        if (!response.ok) {
+            analyticsService.trackEvent('network_error', {
+                url: args[0],
+                status: response.status,
+                status_text: response.statusText,
+                error_type: 'http_error'
+            })
+        }
+
+        return response
+    } catch (error) {
+        // Отслеживаем сетевые ошибки (отсутствие соединения и т.д.)
+        analyticsService.trackError(`Network Error: ${error.message}`, false)
+        analyticsService.trackEvent('network_error', {
+            url: args[0],
+            error_type: 'fetch_error',
+            error_message: error.message
+        })
+
+        throw error
+    }
+}
+
+// Проверяем обновления расширения
+if (chrome.runtime.onInstalled) {
+    chrome.runtime.onInstalled.addListener((details) => {
+        if (details.reason === 'update') {
+            analyticsService.trackEvent('extension_updated', {
+                previous_version: details.previousVersion,
+                current_version: chrome.runtime.getManifest().version,
+                update_type: details.reason
+            })
+        }
+    })
+}
+
+// Сохраняем время начала сессии
+localStorage.setItem('session_start_time', Date.now().toString())
+
 Vue.use(VueAxios, {
     axios
 })

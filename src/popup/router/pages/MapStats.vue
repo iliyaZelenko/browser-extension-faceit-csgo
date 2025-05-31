@@ -210,6 +210,15 @@ export default {
 
   created () {
     this.loadMapData()
+    
+    // Отслеживаем выбор карты для просмотра
+    const mapLabel = this.$route.params.mapLabel
+    if (mapLabel) {
+      this.$analytics.trackEvent('map_selected', {
+        map_name: mapLabel,
+        source: 'direct_navigation'
+      })
+    }
   },
 
   methods: {
@@ -222,12 +231,68 @@ export default {
                     segment.mode === '5v5' &&
                     segment.label === mapLabel
         )
+        
+        if (this.mapData) {
+          // Отслеживаем успешный просмотр статистики карты
+          this.$analytics.trackEvent('map_stats_viewed', {
+            map_name: mapLabel,
+            matches_played: this.mapData.stats?.['Matches'] || 0,
+            win_rate: this.mapData.stats?.['Win Rate %'] || 0,
+            avg_kd: this.mapData.stats?.['Average K/D Ratio'] || 0,
+            avg_hs: this.mapData.stats?.['Average Headshots %'] || 0
+          })
+          
+          // Отслеживаем анализ производительности на карте
+          this.$analytics.trackEvent('map_performance_analyzed', {
+            map_name: mapLabel,
+            performance_level: this.getPerformanceLevel(),
+            total_kills: this.mapData.stats?.['Kills'] || 0,
+            total_deaths: this.mapData.stats?.['Deaths'] || 0,
+            headshot_percentage: this.mapData.stats?.['Average Headshots %'] || 0
+          })
+        } else {
+          // Отслеживаем случай когда карта не найдена
+          this.$analytics.trackEvent('map_not_found', {
+            map_name: mapLabel,
+            available_maps: this.fullStats.segments?.filter(s => s.type === 'Map').map(s => s.label) || []
+          })
+        }
       }
     },
 
+    getPerformanceLevel() {
+      if (!this.mapData?.stats) return 'unknown'
+      
+      const winRate = parseFloat(this.mapData.stats['Win Rate %']) || 0
+      const kdRatio = parseFloat(this.mapData.stats['Average K/D Ratio']) || 0
+      
+      if (winRate >= 70 && kdRatio >= 1.5) return 'excellent'
+      if (winRate >= 60 && kdRatio >= 1.2) return 'good' 
+      if (winRate >= 50 && kdRatio >= 1.0) return 'average'
+      return 'below_average'
+    },
+
     goBack () {
+      // Отслеживаем возврат со страницы карты
+      this.$analytics.trackEvent('map_stats_exited', {
+        map_name: this.$route.params.mapLabel,
+        time_spent: this.getTimeSpent()
+      })
+      
       this.$router.go(-1)
+    },
+    
+    getTimeSpent() {
+      // Простой способ отследить время на странице
+      if (this._pageStartTime) {
+        return Date.now() - this._pageStartTime
+      }
+      return 0
     }
+  },
+  
+  mounted() {
+    this._pageStartTime = Date.now()
   }
 }
 </script>

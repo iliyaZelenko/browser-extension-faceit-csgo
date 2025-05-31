@@ -78,6 +78,26 @@
     />
   </div>
 
+  <!-- Состояния когда игрок не загружен -->
+  
+  <!-- Экран ошибки загрузки -->
+  <LoadingError
+    v-else-if="hasLoadingError"
+    :title="$browser.i18n.getMessage('loadingErrorTitle') || 'Не удалось загрузить профиль'"
+    :description="$browser.i18n.getMessage('loadingErrorDescription') || 'Проверьте подключение к интернету или попробуйте позже'"
+    :retry-text="$browser.i18n.getMessage('retry') || 'Повторить'"
+    :reset-text="$browser.i18n.getMessage('searchPlayer') || 'Поиск игрока'"
+    @retry="$emit('retry-loading')"
+    @reset="$emit('reset-to-search')"
+  />
+
+  <!-- Экран загрузки -->
+  <LoadingState
+    v-else-if="isLoading"
+    :title="$browser.i18n.getMessage('loadingTitle') || 'Загрузка профиля...'"
+    :description="$browser.i18n.getMessage('loadingDescription') || 'Получаем данные игрока с серверов Faceit'"
+  />
+
   <!-- Empty State когда игрок не выбран -->
   <EmptyState v-else />
 </template>
@@ -85,11 +105,15 @@
 <script>
 import MapSelector from './components/MapSelector.vue'
 import EmptyState from './components/EmptyState.vue'
+import LoadingState from './components/LoadingState.vue'
+import LoadingError from './components/LoadingError.vue'
 
 export default {
   components: {
     MapSelector,
-    EmptyState
+    EmptyState,
+    LoadingState,
+    LoadingError
   },
   props: {
     player: {
@@ -99,6 +123,14 @@ export default {
     fullStats: {
       type: Object,
       default: () => ({})
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
+    },
+    hasLoadingError: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -125,6 +157,7 @@ export default {
       return this.fullStats.segments.filter(i => i.type === 'Map' && i.mode === '5v5')
     }
   },
+  emits: ['retry-loading', 'reset-to-search'],
   methods: {
     avatarOrDefault (avatar) {
       if (!avatar || avatar === 'https://d50m6q67g4bn3.cloudfront.net/avatars/084a317c-6346-4dde-ab85-744f469fc217_1464715706995') {

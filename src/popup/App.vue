@@ -20,9 +20,27 @@ export default {
 
     // Отслеживаем запуск приложения в Google Analytics
     this.$analytics.trackPageView('popup_opened')
-    this.$analytics.trackEvent('app_launch', {
+    this.$analytics.trackEvent('extension_opened', {
       timestamp: new Date().toISOString(),
-      browser: this.getBrowserInfo()
+      browser: this.getBrowserInfo(),
+      version: chrome.runtime.getManifest().version
+    })
+
+    // Проверяем, первый ли раз пользователь открывает расширение
+    this.checkFirstTimeUser()
+  },
+  mounted() {
+    // Отслеживаем время рендеринга страницы
+    this.$nextTick(() => {
+      const renderTime = performance.now()
+      this.$analytics.trackTiming('page_render_time', Math.round(renderTime))
+    })
+  },
+  beforeUnmount() {
+    // Отслеживаем закрытие расширения
+    this.$analytics.trackEvent('extension_closed', {
+      timestamp: new Date().toISOString(),
+      session_duration: this.getSessionDuration()
     })
   },
   methods: {
@@ -33,6 +51,25 @@ export default {
       if (userAgent.includes('Safari')) return 'safari'
       if (userAgent.includes('Edge')) return 'edge'
       return 'unknown'
+    },
+    
+    checkFirstTimeUser() {
+      const hasVisited = localStorage.getItem('faceit_extension_visited')
+      if (!hasVisited) {
+        localStorage.setItem('faceit_extension_visited', 'true')
+        this.$analytics.trackEvent('first_time_user', {
+          timestamp: new Date().toISOString(),
+          version: chrome.runtime.getManifest().version
+        })
+      }
+    },
+    
+    getSessionDuration() {
+      const startTime = localStorage.getItem('session_start_time')
+      if (startTime) {
+        return Date.now() - parseInt(startTime)
+      }
+      return 0
     }
   },
   errorCaptured (err, vm, info) {

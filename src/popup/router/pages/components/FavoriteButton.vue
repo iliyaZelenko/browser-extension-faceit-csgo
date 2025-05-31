@@ -71,6 +71,14 @@ export default {
       this.favoritesList.push(favoritePlayer)
       this.saveFavorites()
 
+      this.$analytics.trackEvent('player_added_to_favorites', {
+        player_id: this.player.player_id,
+        nickname: this.player.nickname,
+        skill_level: this.player.games?.csgo?.skill_level || 'unknown',
+        elo: this.player.games?.csgo?.faceit_elo || 0,
+        total_favorites: this.favoritesList.length
+      })
+
       this.$browser.notifications.create({
         type: 'basic',
         iconUrl: this.$browser.runtime.getURL('icons/icon_48.png'),
@@ -79,8 +87,18 @@ export default {
       })
     },
     removeFromFavorites () {
+      const oldLength = this.favoritesList.length
       this.favoritesList = this.favoritesList.filter(fav => fav.player_id !== this.player.player_id)
       this.saveFavorites()
+
+      this.$analytics.trackEvent('player_removed_from_favorites', {
+        player_id: this.player.player_id,
+        nickname: this.player.nickname,
+        skill_level: this.player.games?.csgo?.skill_level || 'unknown',
+        elo: this.player.games?.csgo?.faceit_elo || 0,
+        total_favorites: this.favoritesList.length,
+        removed_count: oldLength - this.favoritesList.length
+      })
 
       this.$browser.notifications.create({
         type: 'basic',

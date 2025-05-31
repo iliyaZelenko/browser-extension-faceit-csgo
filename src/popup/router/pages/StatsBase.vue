@@ -36,8 +36,12 @@
         :full-stats="fullStats"
         :local-storage-nickname="localStorageNickname"
         :selected-game="selectedGame"
+        :is-loading="isLoadingProfile"
+        :has-loading-error="hasLoadingError"
         @profile-error="onProfileError"
         @set-local-storage-nickname="setLocalStorageNickname"
+        @retry-loading="retryLoading"
+        @reset-to-search="resetToSearch"
       />
 
     </div>
@@ -67,7 +71,10 @@ export default {
       fullStats: null,
       defaultAvatar: 'https://cdn-frontend.faceit.com/web/54-1542827848/static/media/avatar_default_user_300x300.8befe042.jpg',
       localStorageNicknameData: validNickname,
-      selectedGame: localStorage.getItem('selectedGame') || GAMES.CSGO
+      selectedGame: localStorage.getItem('selectedGame') || GAMES.CSGO,
+      isLoadingProfile: false,
+      hasLoadingError: false,
+      loadingTimeoutId: null
     }
   },
   computed: {
@@ -119,6 +126,9 @@ export default {
   async created () {
     // if nickname was saved
     if (this.nickname) {
+      // Показываем состояние загрузки для сохраненного игрока
+      this.startLoading()
+      
       // Эмулируем поиск для сохраненного никнейма
       this.$nextTick(() => {
         this.$refs.playerSearch?.findPlayer({ nickname: this.nickname })
@@ -131,6 +141,11 @@ export default {
   beforeDestroy () {
     // Убираем слушатель при уничтожении компонента
     this.$root.$off('search-player', this.searchPlayerFromFavorites)
+    
+    // Очищаем таймаут загрузки
+    if (this.loadingTimeoutId) {
+      clearTimeout(this.loadingTimeoutId)
+    }
   },
   methods: {
     setLocalStorageNickname (val) {
@@ -142,15 +157,28 @@ export default {
 
       // Если игра изменилась и есть выбранный игрок, перезагружаем данные
       if (previousGame !== game && this.player) {
+        this.startLoading()
         this.$refs.playerSearch?.findPlayer()
       }
     },
     onPlayerFound ({ player, fullStats, nickname }) {
+      // Останавливаем загрузку при успешном получении данных
+      this.clearLoadingState()
+      
       this.player = player
       this.fullStats = fullStats
       this.nickname = nickname
     },
     onProfileError () {
+      // При ошибке профиля показываем экран ошибки
+      this.isLoadingProfile = false
+      this.hasLoadingError = true
+      
+      if (this.loadingTimeoutId) {
+        clearTimeout(this.loadingTimeoutId)
+        this.loadingTimeoutId = null
+      }
+      
       this.player = null
       this.fullStats = null
     },
@@ -161,9 +189,59 @@ export default {
       return avatar
     },
     async searchPlayerFromFavorites (nickname) {
+      // Показываем загрузку при поиске из избранных
+      this.startLoading()
+      
       // Устанавливаем никнейм и выполняем поиск через компонент PlayerSearch
       this.nickname = nickname
       this.$refs.playerSearch?.findPlayer({ nickname })
+    },
+    retryLoading () {
+      // Сбрасываем ошибку и повторяем загрузку
+      this.hasLoadingError = false
+      this.startLoading()
+      
+      // Повторяем поиск текущего игрока
+      if (this.nickname) {
+        this.$refs.playerSearch?.findPlayer({ nickname: this.nickname })
+      }
+    },
+    resetToSearch () {
+      // Сбрасываем все состояния и возвращаемся к поиску
+      this.clearLoadingState()
+      this.player = null
+      this.fullStats = null
+      this.nickname = null
+      this.localStorageNickname = null
+    },
+    startLoading () {
+      this.isLoadingProfile = true
+      this.hasLoadingError = false
+      
+      // Устанавливаем таймаут на 15 секунд
+      this.loadingTimeoutId = setTimeout(() => {
+        if (this.isLoadingProfile) {
+          this.isLoadingProfile = false
+          this.hasLoadingError = true
+          
+          // Отслеживаем таймаут загрузки
+          if (this.$analytics) {
+            this.$analytics.trackEvent('profile_loading_timeout', {
+              nickname: this.nickname,
+              timeout_duration: 15000
+            })
+          }
+        }
+      }, 15000)
+    },
+    clearLoadingState () {
+      this.isLoadingProfile = false
+      this.hasLoadingError = false
+      
+      if (this.loadingTimeoutId) {
+        clearTimeout(this.loadingTimeoutId)
+        this.loadingTimeoutId = null
+      }
     }
   }
 }

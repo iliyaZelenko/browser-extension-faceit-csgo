@@ -71,6 +71,12 @@ export default {
   },
   mounted () {
     this.loadFavorites()
+    
+    // Отслеживаем просмотр списка избранных
+    this.$analytics.trackEvent('favorites_list_viewed', {
+      total_favorites: this.favoritesList.length,
+      has_favorites: this.favoritesList.length > 0
+    })
   },
   methods: {
     loadFavorites () {
@@ -86,6 +92,16 @@ export default {
     },
 
     viewPlayerStats (nickname) {
+      // Отслеживаем выбор игрока из избранных
+      const selectedPlayer = this.favoritesList.find(p => p.nickname === nickname)
+      this.$analytics.trackEvent('favorite_player_selected', {
+        player_id: selectedPlayer?.player_id || 'unknown',
+        nickname: nickname,
+        skill_level: selectedPlayer?.skill_level || 'unknown',
+        elo: selectedPlayer?.faceit_elo || 0,
+        total_favorites: this.favoritesList.length
+      })
+
       // Переходим на главную страницу и инициируем поиск
       this.$router.push({ name: 'index' })
 
@@ -97,8 +113,19 @@ export default {
     },
 
     removeFromFavorites (playerId) {
+      const removedPlayer = this.favoritesList.find(p => p.player_id === playerId)
       this.favoritesList = this.favoritesList.filter(player => player.player_id !== playerId)
       this.saveFavorites()
+
+      // Отслеживаем удаление из избранного на странице избранных
+      this.$analytics.trackEvent('player_removed_from_favorites', {
+        player_id: playerId,
+        nickname: removedPlayer?.nickname || 'unknown',
+        skill_level: removedPlayer?.skill_level || 'unknown',
+        elo: removedPlayer?.faceit_elo || 0,
+        total_favorites: this.favoritesList.length,
+        source: 'favorites_page'
+      })
 
       this.$browser.notifications.create({
         type: 'basic',

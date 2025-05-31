@@ -107,6 +107,14 @@ export default {
         return
       }
 
+      // Отслеживаем начало поиска игрока
+      this.$analytics.trackEvent('player_search_started', {
+        nickname: this.nickname,
+        search_length: this.nickname.length,
+        selected_game: this.selectedGame,
+        is_url: this.nickname.includes('faceit.com')
+      })
+
       // parse url
       if (this.nickname.includes('faceit.com')) {
         this.nickname = this.nickname.match(/players\/(.*)/)[1]
@@ -120,6 +128,7 @@ export default {
       }
 
       this.loading = true
+      const searchStartTime = performance.now()
 
       try {
         const player = await faceitApi.getPlayer(this.nickname, this.selectedGame)
@@ -155,6 +164,19 @@ export default {
           }
         }
 
+        // Отслеживаем успешный поиск игрока
+        const searchTime = performance.now() - searchStartTime
+        this.$analytics.trackEvent('player_search_success', {
+          nickname: this.nickname,
+          player_id: player?.player_id || 'unknown',
+          skill_level: player?.games?.[this.selectedGame]?.skill_level || 'unknown',
+          elo: player?.games?.[this.selectedGame]?.faceit_elo || 0,
+          has_stats: !!fullStats,
+          search_time: Math.round(searchTime)
+        })
+        
+        this.$analytics.trackTiming('api_response_time', Math.round(searchTime))
+
         logUserAction('player_found_successfully', {
           nickname: this.nickname,
           player_id: player?.player_id,
@@ -163,6 +185,15 @@ export default {
 
         this.$emit('player-found', { player, fullStats, nickname: this.nickname })
       } catch (e) {
+        // Отслеживаем неудачный поиск игрока
+        const searchTime = performance.now() - searchStartTime
+        this.$analytics.trackEvent('player_search_failed', {
+          nickname: this.nickname,
+          error_type: e.message.includes('404') ? 'player_not_found' : 'api_error',
+          error_message: e.message,
+          search_time: Math.round(searchTime)
+        })
+
         if (e.message.includes('404')) {
           logWarning('Player not found', {
             nickname: this.nickname,
@@ -176,6 +207,13 @@ export default {
             'message': `Nickname ${this.nickname} not found.`
           })
         } else {
+          // Отслеживаем API ошибки
+          this.$analytics.trackEvent('api_error_occurred', {
+            error_type: 'player_search',
+            error_message: e.message,
+            nickname: this.nickname
+          })
+
           // Неожиданная ошибка при поиске игрока
           logCriticalError(e, {
             context: 'player_search',
@@ -204,6 +242,8 @@ export default {
 
       clearTimeout(this.searchTimeoutId)
       this.searchTimeoutId = setTimeout(async () => {
+        const searchStartTime = performance.now()
+        
         try {
           const { items } = await faceitApi.searchPlayers(search, this.selectedGame, 5)
           this.players = items || []
@@ -211,6 +251,15 @@ export default {
           if (!this.players.length) {
             this.noData = true
           }
+          
+          // Отслеживаем автокомплит поиска
+          const searchTime = performance.now() - searchStartTime
+          this.$analytics.trackEvent('player_autocomplete_search', {
+            search_query: search,
+            result_count: this.players.length,
+            selected_game: this.selectedGame,
+            search_time: Math.round(searchTime)
+          })
           
           logUserAction('autocomplete_search_completed', {
             search,
@@ -220,6 +269,13 @@ export default {
         } catch (e) {
           this.players = []
           this.noData = true
+          
+          // Отслеживаем ошибку автокомплита
+          this.$analytics.trackEvent('autocomplete_search_failed', {
+            search_query: search,
+            error_message: e.message,
+            selected_game: this.selectedGame
+          })
           
           logWarning('Autocomplete search failed', {
             search,

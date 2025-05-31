@@ -27,11 +27,11 @@
 
       <!-- Loading state -->
       <div
-        v-if="loadingMatches"
+        v-if="isLoadingMatches"
         class="loading-state"
       >
         <div class="spinner" />
-        <p>{{ $browser.i18n.getMessage('loadingMatches') }}</p>
+        <p>{{ $browser.i18n.getMessage('loadingMatches') || 'Загрузка матчей...' }}</p>
       </div>
 
       <!-- Matches list -->
@@ -60,7 +60,7 @@
 
     <!-- Load more button -->
     <div
-      v-if="matches.length > 0 && !loadingMatches"
+      v-if="matches.length > 0 && !isLoadingMatches && hasMore"
       class="load-more-section"
     >
       <button
@@ -74,6 +74,26 @@
     </div>
   </div>
 
+  <!-- Состояния когда игрок не загружен -->
+  
+  <!-- Экран ошибки загрузки -->
+  <LoadingError
+    v-else-if="hasLoadingError"
+    :title="$browser.i18n.getMessage('loadingErrorTitle') || 'Не удалось загрузить профиль'"
+    :description="$browser.i18n.getMessage('loadingErrorDescription') || 'Проверьте подключение к интернету или попробуйте позже'"
+    :retry-text="$browser.i18n.getMessage('retry') || 'Повторить'"
+    :reset-text="$browser.i18n.getMessage('searchPlayer') || 'Поиск игрока'"
+    @retry="$emit('retry-loading')"
+    @reset="$emit('reset-to-search')"
+  />
+
+  <!-- Экран загрузки -->
+  <LoadingState
+    v-else-if="isLoading"
+    :title="$browser.i18n.getMessage('loadingTitle') || 'Загрузка профиля...'"
+    :description="$browser.i18n.getMessage('loadingDescription') || 'Получаем данные игрока с серверов Faceit'"
+  />
+
   <!-- Empty State когда игрок не выбран -->
   <EmptyState v-else />
 </template>
@@ -82,6 +102,8 @@
 import RecentResults from './components/RecentResults.vue'
 import MatchCard from './components/MatchCard.vue'
 import EmptyState from './components/EmptyState.vue'
+import LoadingState from './components/LoadingState.vue'
+import LoadingError from './components/LoadingError.vue'
 import { faceitApi } from '../../services/faceitApi.js'
 import { getMatchResult, getMatchResultLetter, findPlayerTeam } from '../../utils/matchUtils.js'
 import { logWarning, logUserAction, logCriticalError } from '../../services/sentry.js'
@@ -90,7 +112,9 @@ export default {
   components: {
     RecentResults,
     MatchCard,
-    EmptyState
+    EmptyState,
+    LoadingState,
+    LoadingError
   },
   props: {
     player: {
@@ -108,6 +132,14 @@ export default {
     selectedGame: {
       type: String,
       default: 'csgo'
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
+    },
+    hasLoadingError: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -118,7 +150,6 @@ export default {
       offset: 0,
       limit: 20,
       highlightedMatchIndex: null,
-      isLoading: false,
       currentPage: 0,
       hasMore: true
     }
@@ -129,6 +160,9 @@ export default {
     },
     recentMatches () {
       return this.matches.slice(0, 5)
+    },
+    isLoadingMatches () {
+      return this.loadingMatches || (this.matches.length === 0 && this.currentPage === 0 && this.hasMore)
     }
   },
   watch: {
@@ -156,52 +190,66 @@ export default {
     }
   },
   async mounted () {
-    if (this.player?.player_id) {
-      await this.loadMatches()
-      // Подсветка теперь вызывается после загрузки матчей
-      this.handleHighlightFromQuery()
-    }
+    // Отслеживаем просмотр истории матчей
+    this.$analytics.trackEvent('match_history_loaded', {
+      player_id: this.player?.player_id || 'unknown',
+      nickname: this.player?.nickname || 'unknown',
+      selected_game: this.selectedGame
+    })
+
+    this.resetAndLoad()
+    this.handleHighlightFromQuery()
   },
   methods: {
     async loadMatches () {
-      if (this.isLoading || !this.hasMore || !this.player?.player_id) return
+      if (this.loadingMatches || !this.hasMore) return
 
-      this.isLoading = true
+      this.loadingMatches = true
+      const startTime = performance.now()
 
       try {
-        const { items } = await faceitApi.getPlayerMatches(
-          this.player.player_id,
-          this.selectedGame,
-          this.currentPage * 20,
-          20
-        )
+        const response = await faceitApi.getPlayerMatches(this.player.player_id, this.selectedGame, this.currentPage)
+        const newMatches = response.items || []
 
-        if (items && items.length > 0) {
-          this.matches.push(...items)
-          this.currentPage++
-
-          if (items.length < 20) {
-            this.hasMore = false
-          }
-          
-          logUserAction('matches_loaded', {
-            player_id: this.player.player_id,
-            page: this.currentPage - 1,
-            loadedCount: items.length,
-            totalMatches: this.matches.length
-          })
-        } else {
+        if (newMatches.length === 0) {
           this.hasMore = false
           
-          logWarning('No matches found for player', {
+          // Отслеживаем отсутствие матчей
+          this.$analytics.trackEvent('match_history_empty', {
             player_id: this.player.player_id,
-            selectedGame: this.selectedGame,
+            selected_game: this.selectedGame,
             page: this.currentPage
           })
+        } else {
+          this.matches.push(...newMatches)
+          this.currentPage++
+
+          // Отслеживаем успешную загрузку матчей
+          const loadTime = performance.now() - startTime
+          this.$analytics.trackTiming('api_response_time', Math.round(loadTime))
+          this.$analytics.trackEvent('match_history_loaded', {
+            player_id: this.player.player_id,
+            matches_count: newMatches.length,
+            total_matches: this.matches.length,
+            page: this.currentPage - 1
+          })
+
+          // Проверяем есть ли еще матчи для загрузки
+          if (newMatches.length < 20) {
+            this.hasMore = false
+          }
         }
       } catch (error) {
         console.error('Error loading matches:', error)
         this.hasMore = false
+        
+        // Отслеживаем ошибку загрузки матчей
+        this.$analytics.trackError(`Match history load failed: ${error.message}`, false)
+        this.$analytics.trackEvent('data_load_failed', {
+          error_type: 'match_history',
+          player_id: this.player.player_id,
+          error_message: error.message
+        })
         
         // Логируем ошибку загрузки матчей
         if (error.message.includes('404')) {
@@ -220,7 +268,7 @@ export default {
         }
       }
 
-      this.isLoading = false
+      this.loadingMatches = false
     },
     async resetAndLoad () {
       logUserAction('reset_match_history', {
@@ -231,6 +279,7 @@ export default {
       this.matches = []
       this.currentPage = 0
       this.hasMore = true
+      this.loadingMatches = false
       await this.loadMatches()
       // Применяем подсветку после загрузки новых матчей
       this.handleHighlightFromQuery()
@@ -248,6 +297,16 @@ export default {
       return getMatchResultLetter(match, this.player.player_id)
     },
     goToSpecificMatch (index) {
+      // Отслеживаем открытие конкретного матча
+      const match = this.matches[index]
+      this.$analytics.trackEvent('specific_match_opened', {
+        match_id: match?.match_id || 'unknown',
+        match_index: index,
+        player_id: this.player.player_id,
+        nickname: this.player.nickname,
+        match_result: this.getMatchResult(match)
+      })
+
       this.highlightedMatchIndex = index
 
       // Убираем подсветку через 3 секунды
@@ -306,7 +365,8 @@ export default {
         }
       }
     }
-  }
+  },
+  emits: ['retry-loading', 'reset-to-search']
 }
 </script>
 

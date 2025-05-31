@@ -81,7 +81,7 @@
         >
           <span
             class="progress-value"
-            :style="`width: ${progressPercentage}%;`"
+            :style="`width: ${progressPercentage}%; background-color: ${progressBarColor};`"
           />
         </div>
       </template>
@@ -147,6 +147,26 @@
     </div>
   </div>
 
+  <!-- Состояния когда игрок не загружен -->
+  
+  <!-- Экран ошибки загрузки -->
+  <LoadingError
+    v-else-if="hasLoadingError"
+    :title="$browser.i18n.getMessage('loadingErrorTitle') || 'Не удалось загрузить профиль'"
+    :description="$browser.i18n.getMessage('loadingErrorDescription') || 'Проверьте подключение к интернету или попробуйте позже'"
+    :retry-text="$browser.i18n.getMessage('retry') || 'Повторить'"
+    :reset-text="$browser.i18n.getMessage('searchPlayer') || 'Поиск игрока'"
+    @retry="$emit('retry-loading')"
+    @reset="$emit('reset-to-search')"
+  />
+
+  <!-- Экран загрузки -->
+  <LoadingState
+    v-else-if="isLoading"
+    :title="$browser.i18n.getMessage('loadingTitle') || 'Загрузка профиля...'"
+    :description="$browser.i18n.getMessage('loadingDescription') || 'Получаем данные игрока с серверов Faceit'"
+  />
+
   <!-- Empty State когда игрок не выбран -->
   <EmptyState v-else />
 </template>
@@ -154,6 +174,8 @@
 <script>
 import EmptyState from './components/EmptyState.vue'
 import FavoriteButton from './components/FavoriteButton.vue'
+import LoadingState from './components/LoadingState.vue'
+import LoadingError from './components/LoadingError.vue'
 import { faceitApi } from '../../services/faceitApi.js'
 import { getMatchResult, getMatchResultClass } from '../../utils/matchUtils.js'
 import { logCriticalError, logWarning, logUserAction, setSentryUser, clearSentryUser } from '../../services/sentry.js'
@@ -161,7 +183,9 @@ import { logCriticalError, logWarning, logUserAction, setSentryUser, clearSentry
 export default {
   components: {
     EmptyState,
-    FavoriteButton
+    FavoriteButton,
+    LoadingState,
+    LoadingError
   },
   props: {
     player: {
@@ -183,6 +207,14 @@ export default {
     selectedGame: {
       type: String,
       default: 'csgo'
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
+    },
+    hasLoadingError: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -207,10 +239,22 @@ export default {
   },
   computed: {
     progressLabel () {
-      return `${this.csgoStats.faceit_elo} / ${this.currentLvlNextLvlStart} (${Math.floor(this.csgoStats.faceit_elo / this.currentLvlNextLvlStart * 100)} %)`
+      // Для максимального уровня показываем текущее ELO
+      if (this.csgoStats.skill_level >= 10) {
+        return `${this.csgoStats.faceit_elo} (Max lvl)`
+      }
+      // return `${this.csgoStats.faceit_elo} / ${this.currentLvlNextLvlStart} (${Math.floor(this.csgoStats.faceit_elo / this.currentLvlNextLvlStart * 100)} %)`
+      return `${this.csgoStats.faceit_elo} - ${this.currentLvlNextLvlStart} (${this.progressPercentage} %)`
     },
     progressPercentage () {
-      return Math.floor(this.csgoStats.faceit_elo / this.currentLvlNextLvlStart * 100)
+      // Для максимального уровня прогресс всегда 100%
+      if (this.csgoStats.skill_level >= 10) {
+        return 100
+      }
+
+      // Возвращает прогресс в процентах от текущего уровня до следующего
+      return Math.floor((this.csgoStats.faceit_elo - this.lvls[this.currentLvlIndex].range[0]) / (this.currentLvlNextLvlStart - this.lvls[this.currentLvlIndex].range[0]) * 100)
+      // return Math.floor(this.csgoStats.faceit_elo / this.currentLvlNextLvlStart * 100)
     },
     profileUrl () {
       return this.player.faceit_url.replace(/{lang}/, 'en')
@@ -243,18 +287,44 @@ export default {
         })
 
         this.$emit('profile-error')
+        
+        // Возвращаем fallback для предотвращения дальнейших ошибок
+        return this.lvls[0] // Возвращаем первый уровень как fallback
       }
 
       return range
     },
     currentLvlIndex () {
-      return this.lvls.indexOf(this.currentLvl)
+      const lvl = this.currentLvl
+      if (!lvl) return 0 // Защита от undefined
+      return this.lvls.indexOf(lvl)
     },
     currentLvlNextLvlStart () {
+      // Если это максимальный уровень (10), возвращаем текущее ELO (не используется в UI)
+      if (this.currentLvlIndex >= this.lvls.length - 1) {
+        return this.csgoStats.faceit_elo
+      }
       return this.lvls[this.currentLvlIndex + 1].range[0]
     },
     lastMatches () {
       return this.matches.slice(0, 5)
+    },
+    // Динамический цвет прогресс-бара
+    progressBarColor () {
+      const progress = this.progressPercentage
+      
+      if (progress <= 30) {
+        // Красный для низкого прогресса (0-30%)
+        return '#f44336'
+      } else if (progress <= 70) {
+        // Переход от красного к желтому/оранжевому (30-70%)
+        const ratio = (progress - 30) / 40 // 0-1
+        return `hsl(${20 * ratio}, 80%, 50%)` // От красного (0°) к оранжевому (20°)
+      } else {
+        // Переход от оранжевого к зеленому (70-100%)
+        const ratio = (progress - 70) / 30 // 0-1
+        return `hsl(${20 + 100 * ratio}, 70%, 45%)` // От оранжевого (20°) к зеленому (120°)
+      }
     }
   },
   watch: {
@@ -262,6 +332,15 @@ export default {
       handler (newPlayer, oldPlayer) {
         // eslint-disable-next-line camelcase
         if (newPlayer?.player_id && newPlayer.player_id !== oldPlayer?.player_id) {
+          // Отслеживаем загрузку профиля игрока
+          this.$analytics.trackEvent('player_profile_loaded', {
+            player_id: newPlayer.player_id,
+            nickname: newPlayer.nickname,
+            skill_level: newPlayer.games?.csgo?.skill_level || 'unknown',
+            elo: newPlayer.games?.csgo?.faceit_elo || 0,
+            country: newPlayer.country
+          })
+          
           this.loadLastMatches()
         }
       },
@@ -280,26 +359,39 @@ export default {
     // eslint-disable-next-line camelcase
     if (this.player?.player_id) {
       await this.loadLastMatches()
+      
+      // Отслеживаем время загрузки данных
+      const startTime = performance.now()
+      setTimeout(() => {
+        const loadTime = performance.now() - startTime
+        this.$analytics.trackTiming('data_load_time', Math.round(loadTime))
+      }, 100)
     }
   },
   methods: {
     openProfile () {
-      // var creating =
+      // Отслеживаем переход на профиль Faceit
+      this.$analytics.trackEvent('faceit_profile_opened', {
+        player_id: this.player.player_id,
+        nickname: this.nickname,
+        profile_url: this.profileUrl
+      })
+      
       this.$browser.tabs.create({
         url: this.profileUrl
       })
-      // creating.then(onCreated, onError)
-      //
-      // function onCreated (tab) {
-      //   console.log(`Created new tab: ${tab.id}`)
-      // }
-      //
-      // function onError (error) {
-      //   console.log(`Error: ${error}`)
-      // }
     },
     toggleSaveProfile () {
       const newNickname = this.localStorageNickname === this.nickname ? null : this.nickname
+      
+      // Отслеживаем включение/отключение автозагрузки профиля
+      this.$analytics.trackEvent(
+        newNickname ? 'profile_auto_load_enabled' : 'profile_auto_load_disabled',
+        {
+          nickname: this.nickname,
+          player_id: this.player.player_id
+        }
+      )
       
       // Логируем действие пользователя
       logUserAction('toggle_save_profile', {
@@ -317,6 +409,13 @@ export default {
       this.$emit('set-local-storage-nickname', newNickname)
     },
     goToSpecificMatch (matchIndex) {
+      // Отслеживаем клик по результату матча
+      this.$analytics.trackEvent('match_result_clicked', {
+        match_index: matchIndex,
+        player_id: this.player.player_id,
+        nickname: this.nickname
+      })
+      
       logUserAction('navigate_to_match_history', {
         matchIndex,
         nickname: this.nickname
@@ -329,12 +428,27 @@ export default {
       })
     },
     async loadLastMatches () {
+      const startTime = performance.now()
+      
       try {
         // eslint-disable-next-line camelcase
         const { items } = await faceitApi.getRecentMatches(this.player.player_id, this.selectedGame)
         this.matches = items || []
+        
+        // Отслеживаем успешную загрузку матчей
+        const loadTime = performance.now() - startTime
+        this.$analytics.trackTiming('api_response_time', Math.round(loadTime))
+        
       } catch (error) {
         console.error('Error loading last matches:', error)
+        
+        // Отслеживаем ошибку загрузки данных
+        this.$analytics.trackError(`Data load failed: ${error.message}`, false)
+        this.$analytics.trackEvent('data_load_failed', {
+          error_type: 'recent_matches',
+          player_id: this.player.player_id,
+          error_message: error.message
+        })
         
         // Логируем ошибку загрузки матчей
         logWarning('Failed to load recent matches', {
@@ -454,7 +568,8 @@ export default {
       
       return tooltip
     }
-  }
+  },
+  emits: ['profile-error', 'set-local-storage-nickname', 'retry-loading', 'reset-to-search']
 }
 </script>
 
@@ -558,6 +673,7 @@ export default {
     background-color: #7cc4ff;
     display: inline-block;
     height: 100%;
+    transition: background-color 0.3s ease, width 0.3s ease;
   }
 
   .save-profile-checkbox {
