@@ -1,17 +1,21 @@
 {
     "name": "browser-extension",
-    "version": "2.0.0",
+    "version": "2.0.2",
     "description": "A Vue.js web extension",
     "author": "Ilya Zelenko <iliyazelenkog@gmail.com>",
     "scripts": {
         "lint": "eslint --ext .js,.vue src",
         "build": "NODE_OPTIONS='--openssl-legacy-provider' cross-env NODE_ENV=production webpack --hide-modules",
         "build:dev": "NODE_OPTIONS='--openssl-legacy-provider' cross-env NODE_ENV=development webpack --hide-modules",
-        "build-zip": "node scripts/build-zip.js",
+        "build-zip": "npm test && node scripts/build-zip.js",
         "watch": "npm run build -- --watch",
         "watch:dev": "cross-env HMR=true npm run build:dev -- --watch",
         "dev": "npm run watch:dev",
-        "start": "npm run dev"
+        "start": "npm run dev",
+        "dev:chrome": "node scripts/dev-open-chrome.js",
+        "test:integration": "node scripts/integration-test.js",
+        "test:player": "node scripts/integration-test.js unke666 csgo",
+        "test": "node --test tests/integration/*.test.js tests/unit/*.test.js"
     },
     "resolutions": {
         "chokidar": "^3.3.1"

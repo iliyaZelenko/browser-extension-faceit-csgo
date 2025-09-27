@@ -17,14 +17,25 @@ const SENTRY_CONFIG = {
     }
 }
 
-// Получаем версию расширения из manifest
+// Получаем версию расширения из manifest (кроссбраузерный fallback)
 const getExtensionVersion = () => {
     try {
-        return chrome.runtime.getManifest().version
+        if (browser && browser.runtime && typeof browser.runtime.getManifest === 'function') {
+            const m = browser.runtime.getManifest()
+            if (m && m.version) return m.version
+        }
+    } catch (_) {}
+
+    try {
+        if (typeof chrome !== 'undefined' && chrome.runtime && typeof chrome.runtime.getManifest === 'function') {
+            const m = chrome.runtime.getManifest()
+            if (m && m.version) return m.version
+        }
     } catch (error) {
         console.warn('Could not get extension version:', error)
-        return 'unknown'
     }
+
+    return 'unknown'
 }
 
 // Инициализация Sentry

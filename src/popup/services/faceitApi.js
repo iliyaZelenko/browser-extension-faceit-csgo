@@ -144,7 +144,16 @@ class FaceitApiService {
         logUserAction('load_player_stats', { playerId, game })
 
         const url = `${this.baseUrl}/players/${playerId}/stats/${game}`
-        return await this.request(url)
+        try {
+            return await this.request(url)
+        } catch (error) {
+            // Статистика может отсутствовать для некоторых игроков (часто для CS:GO/CS2 миграций)
+            // Не считаем это фатальной ошибкой — возвращаем null, чтобы UI продолжил работать.
+            if (error && typeof error.message === 'string' && error.message.includes('404')) {
+                return null
+            }
+            throw error
+        }
     }
 
     /**

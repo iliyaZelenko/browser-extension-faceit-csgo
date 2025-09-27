@@ -52,7 +52,7 @@
     </div>-->
 
     <div
-      v-if="csgoStats && csgoStats.skill_level && fullStats"
+      v-if="csgoStats && csgoStats.skill_level"
       class="stats-container"
     >
       <p class="level-info">
@@ -154,6 +154,7 @@
     v-else-if="hasLoadingError"
     :title="$browser.i18n.getMessage('loadingErrorTitle') || 'Не удалось загрузить профиль'"
     :description="$browser.i18n.getMessage('loadingErrorDescription') || 'Проверьте подключение к интернету или попробуйте позже'"
+    :image-src="selectedGame === 'cs2' ? 'https://assets.faceit-cdn.net/third_party/games/ea5c4171-712f-4afd-a8ae-3fb5e1e2afb8.jpeg?width=48&height=48' : 'https://assets.faceit-cdn.net/third_party/games/4f899245-2fa8-4e52-ad9a-4a363613c19e/assets/details/csgo_flag_s_1589795160776.jpg'"
     :retry-text="$browser.i18n.getMessage('retry') || 'Повторить'"
     :reset-text="$browser.i18n.getMessage('searchPlayer') || 'Поиск игрока'"
     @retry="$emit('retry-loading')"
@@ -223,7 +224,8 @@ export default {
     return {
       maxElo,
       matches: [],
-      lvls: [
+      // Диапазоны для CS:GO (исторические)
+      lvlsCsgo: [
         { range: [1, 800], label: '1' },
         { range: [801, 950], label: '2' },
         { range: [951, 1100], label: '3' },
@@ -234,10 +236,27 @@ export default {
         { range: [1701, 1850], label: '8' },
         { range: [1851, 2000], label: '9' },
         { range: [2001, maxElo], label: '10' }
+      ],
+      // Диапазоны для CS2 (по заданию)
+      lvlsCs2: [
+        { range: [100, 500], label: '1' },
+        { range: [501, 750], label: '2' },
+        { range: [751, 900], label: '3' },
+        { range: [901, 1050], label: '4' },
+        { range: [1051, 1200], label: '5' },
+        { range: [1201, 1350], label: '6' },
+        { range: [1351, 1530], label: '7' },
+        { range: [1531, 1750], label: '8' },
+        { range: [1751, 2000], label: '9' },
+        { range: [2001, maxElo], label: '10' }
       ]
     }
   },
   computed: {
+    // Выбор корректных диапазонов уровней по выбранной игре
+    lvls () {
+      return this.selectedGame === 'cs2' ? this.lvlsCs2 : this.lvlsCsgo
+    },
     progressLabel () {
       // Для максимального уровня показываем текущее ELO
       if (this.csgoStats.skill_level >= 10) {
@@ -253,46 +272,44 @@ export default {
       }
 
       // Возвращает прогресс в процентах от текущего уровня до следующего
-      return Math.floor((this.csgoStats.faceit_elo - this.lvls[this.currentLvlIndex].range[0]) / (this.currentLvlNextLvlStart - this.lvls[this.currentLvlIndex].range[0]) * 100)
+      const start = this.lvls[this.currentLvlIndex].range[0]
+      const nextStart = this.currentLvlNextLvlStart
+      const denom = nextStart - start
+      if (denom <= 0) return 100
+      const raw = ((this.csgoStats.faceit_elo - start) / denom) * 100
+      return Math.max(0, Math.min(100, Math.floor(raw)))
       // return Math.floor(this.csgoStats.faceit_elo / this.currentLvlNextLvlStart * 100)
     },
     profileUrl () {
       return this.player.faceit_url.replace(/{lang}/, 'en')
     },
     csgoStats () {
-      return this.player.games[this.selectedGame] || this.player.games.csgo
+      // Защита: если выбранной игры нет в профиле, используем любую доступную
+      const games = this.player?.games || {}
+      return games[this.selectedGame] || games.csgo || games.cs2 || {}
     },
     currentLvl () {
-      // faceit может иметь 0 эло
+      // Faceit может иметь 0 elo. Не провоцируем UI-ошибку при несовпадении elo/level,
+      // так как для CS2 пороги уровней отличаются и часто не совпадают с elo.
       const elo = Math.max(this.csgoStats.faceit_elo, 1)
-      const range = this.lvls.find(i => i.range[0] <= elo && elo <= i.range[1] && i.label === this.csgoStats.skill_level.toString())
+      const skillLevelLabel = this.csgoStats.skill_level?.toString()
 
-      if (!range) {
-        const errorMessage = `This player has a mismatch of elo points (${elo} elo) to his lvl (${this.csgoStats.skill_level} lvl).`
-        
-        // Логируем критическую ошибку в Sentry
-        logCriticalError(new Error('Invalid player profile: elo/level mismatch'), {
+      const rangeByElo = this.lvls.find(i => i.range[0] <= elo && elo <= i.range[1])
+      const rangeByLabel = this.lvls.find(i => i.label === skillLevelLabel)
+
+      if (rangeByLabel && rangeByElo && rangeByLabel.label !== rangeByElo.label) {
+        // Логируем предупреждение, но не ломаем UI
+        logWarning('ELO/level mismatch detected', {
           player_id: this.player.player_id,
           nickname: this.nickname,
           elo,
           skill_level: this.csgoStats.skill_level,
           selectedGame: this.selectedGame
         })
-
-        this.$browser.notifications.create({
-          'type': 'basic',
-          'iconUrl': this.$browser.runtime.getURL('icons/icon_48.png'),
-          'title': 'Invalid profile.',
-          'message': errorMessage
-        })
-
-        this.$emit('profile-error')
-        
-        // Возвращаем fallback для предотвращения дальнейших ошибок
-        return this.lvls[0] // Возвращаем первый уровень как fallback
       }
 
-      return range
+      // Приоритет: то, что пришло из API (label), далее — вычисление по elo, иначе — первый уровень.
+      return rangeByLabel || rangeByElo || this.lvls[0]
     },
     currentLvlIndex () {
       const lvl = this.currentLvl

@@ -25,9 +25,11 @@
         "storage"
     ],
     "host_permissions": [
-        "https://open.faceit.com/",
-        "https://o4509418472013824.ingest.de.sentry.io/",
-        "https://www.google-analytics.com/*"
+        "https://open.faceit.com/*",
+        "https://o4509418472013824.ingest.de.sentry.io/*",
+        "https://www.google-analytics.com/*",
+        "https://firebaseinstallations.googleapis.com/*",
+        "https://firebaseremoteconfig.googleapis.com/*"
     ],
     "commands": {
         "_execute_action": {

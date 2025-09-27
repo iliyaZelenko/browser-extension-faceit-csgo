@@ -116,6 +116,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true // Keep message channel open for async response
 })
 
+// Handle persistent connections from extension pages (e.g., popup hot-reload)
+chrome.runtime.onConnect.addListener((port) => {
+    try {
+        if (port && port.name === 'popup-hot-reload') {
+            console.log('🔌 Popup connected for hot reload')
+
+            port.onDisconnect.addListener(() => {
+                console.log('🔌 Popup disconnected')
+            })
+        }
+    } catch (error) {
+        logBackgroundError(error, {
+            context: 'onConnect_handler',
+            portName: port && port.name
+        })
+    }
+})
+
 // Extension lifecycle events
 chrome.runtime.onInstalled.addListener((details) => {
     try {

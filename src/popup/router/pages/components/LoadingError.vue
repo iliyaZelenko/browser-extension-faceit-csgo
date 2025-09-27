@@ -7,6 +7,9 @@
       
       <h3 class="error-title">{{ title }}</h3>
       <p class="error-description">{{ description }}</p>
+      <div v-if="imageSrc" class="error-image-wrap">
+        <img :src="imageSrc" alt="game" class="error-image">
+      </div>
       
       <div class="error-actions">
         <button 
@@ -40,6 +43,10 @@ export default {
     description: {
       type: String,
       default: 'Проверьте подключение к интернету или попробуйте позже'
+    },
+    imageSrc: {
+      type: String,
+      default: ''
     },
     retryText: {
       type: String,
@@ -95,6 +102,15 @@ export default {
   color: #f44336;
   margin: 0 0 12px 0;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.error-image-wrap { margin: 6px 0 22px; }
+.error-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.3);
 }
 
 .error-description {

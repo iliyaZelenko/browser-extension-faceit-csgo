@@ -161,7 +161,8 @@ export default {
       // Если игра изменилась и есть выбранный игрок, перезагружаем данные
       if (previousGame !== game && this.player) {
         this.startLoading()
-        this.$refs.playerSearch?.findPlayer()
+        // Пытаемся найти того же никнейма в новой игре
+        this.$refs.playerSearch?.findPlayer({ nickname: this.nickname })
       }
     },
     onPlayerFound ({ player, fullStats, nickname }) {
@@ -171,6 +172,15 @@ export default {
       this.player = player
       this.fullStats = fullStats
       this.nickname = nickname
+
+      // Если у игрока отсутствуют данные по выбранной игре,
+      // автоматически переключаемся на доступную игру (например, CS2).
+      const availableGames = Object.keys(this.player?.games || {})
+      if (availableGames.length && !this.player?.games?.[this.selectedGame]) {
+        const fallbackGame = availableGames.includes('csgo') ? 'csgo' : availableGames[0]
+        this.selectedGame = fallbackGame
+        localStorage.setItem('selectedGame', fallbackGame)
+      }
     },
     onProfileError () {
       // При ошибке профиля показываем экран ошибки
@@ -257,12 +267,18 @@ export default {
 }
 
 #background {
-  position: absolute;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
+  min-height: 100vh;
   -webkit-filter: grayscale(100%) blur(2px);
   filter: grayscale(100%) blur(2px);
-  background: no-repeat center;
+  background-repeat: no-repeat;
+  background-position: center center;
   background-size: cover;
   z-index: -1;
 }

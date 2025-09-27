@@ -1,7 +1,14 @@
+const isDevelopment = process.env.NODE_ENV === 'development'
+
 class AnalyticsService {
     constructor() {
         this.initialized = false
+            // GA4 configuration (Measurement Protocol v2)
+        this.ga4MeasurementId = null
+        this.ga4ApiSecret = null
+            // Backward compat: legacy field name we previously used (will be replaced)
         this.measurementId = 'G-YFV8YK7FVQ'
+
         this.sessionId = this.generateSessionId()
         this.clientId = this.getOrCreateClientId()
         this.init()
@@ -23,15 +30,53 @@ class AnalyticsService {
 
     async init() {
         try {
-            // Используем только Measurement Protocol API (совместимо с Manifest V3)
-            this.initialized = true
-            console.log('Google Analytics initialized with Measurement Protocol API')
+            // Load GA4 config from storage (preferred)
+            try {
+                if (typeof browser !== 'undefined' && browser.storage && browser.storage.local) {
+                    const { ga4_measurement_id, ga4_api_secret } = await browser.storage.local.get(['ga4_measurement_id', 'ga4_api_secret'])
+                    if (ga4_measurement_id) this.ga4MeasurementId = ga4_measurement_id
+                    if (ga4_api_secret) this.ga4ApiSecret = ga4_api_secret
+                }
+            } catch (_) {}
 
-            // Отправляем событие о старте расширения
-            await this.trackEvent('extension_started', {
-                version: chrome.runtime.getManifest().version,
-                session_id: this.sessionId
+            // Enforce desired GA4 measurement id
+            const desiredMeasurementId = 'G-YFV8YK7FVQ'
+            if (!this.ga4MeasurementId || this.ga4MeasurementId !== desiredMeasurementId) {
+                this.ga4MeasurementId = desiredMeasurementId
+            }
+            if (!this.ga4ApiSecret) {
+                // Установим предоставленный секрет по умолчанию, если его нет в storage
+                this.ga4ApiSecret = 'G-0PQ4BGM7CT'
+            }
+
+            // Persist config back to storage for future sessions
+            try {
+                if (typeof browser !== 'undefined' && browser.storage && browser.storage.local) {
+                    await browser.storage.local.set({
+                        ga4_measurement_id: this.ga4MeasurementId,
+                        ga4_api_secret: this.ga4ApiSecret
+                    })
+                }
+            } catch (_) {}
+
+            // Initialize
+            this.initialized = true
+            console.log('Google Analytics (GA4) initialized with Measurement Protocol v2', {
+                measurementId: this.ga4MeasurementId,
+                hasApiSecret: Boolean(this.ga4ApiSecret)
             })
+
+            // Send startup event
+            let version = 'unknown'
+            try {
+                if (typeof browser !== 'undefined' && browser.runtime && typeof browser.runtime.getManifest === 'function') {
+                    version = browser.runtime.getManifest().version || version
+                } else if (typeof chrome !== 'undefined' && chrome.runtime && typeof chrome.runtime.getManifest === 'function') {
+                    version = chrome.runtime.getManifest().version || version
+                }
+            } catch (_) {}
+
+            await this.trackEvent('extension_started', { version, session_id: this.sessionId })
         } catch (error) {
             console.error('Failed to initialize Google Analytics:', error)
         }
@@ -49,7 +94,7 @@ class AnalyticsService {
         }
 
         try {
-            await this.sendEventViaAPI(eventName, parameters)
+            await this.sendEventViaGA4(eventName, parameters)
         } catch (error) {
             console.error('Failed to track event:', error)
         }
@@ -66,7 +111,7 @@ class AnalyticsService {
         }
 
         try {
-            await this.sendPageViewViaAPI(pageName)
+            await this.sendPageViewViaGA4(pageName)
         } catch (error) {
             console.error('Failed to track page view:', error)
         }
@@ -140,64 +185,57 @@ class AnalyticsService {
      * @param {string} eventName - название события
      * @param {object} parameters - параметры события
      */
-    async sendEventViaAPI(eventName, parameters = {}) {
+    async sendEventViaGA4(eventName, parameters = {}) {
         try {
-            const payload = {
-                v: '1', // Version
-                tid: this.measurementId, // Tracking ID
-                cid: this.clientId, // Client ID
-                t: 'event', // Hit Type
-                ec: 'faceit_extension', // Event Category
-                ea: eventName, // Event Action
-                el: parameters.label || '', // Event Label
-                ev: parameters.value || '', // Event Value
-                // Дополнительные параметры
-                an: 'Faceit Extension', // App Name
-                av: chrome.runtime.getManifest().version, // App Version
-                ua: navigator.userAgent, // User Agent
-                ul: navigator.language, // User Language
-                sr: `${screen.width}x${screen.height}`, // Screen Resolution
-                sd: `${screen.colorDepth}-bits`, // Screen Colors
-                // Session info
-                sc: 'start', // Session Control (для первого события в сессии)
-                // Custom dimensions
-                cd1: parameters.component || '', // Custom dimension 1
-                cd2: parameters.context || '', // Custom dimension 2
-                cd3: parameters.session_id || this.sessionId, // Custom dimension 3
+            if (!this.ga4MeasurementId || !this.ga4ApiSecret) {
+                console.warn('GA4 is not fully configured: missing measurementId or apiSecret')
+                return
             }
 
-            // Добавляем дополнительные параметры как custom metrics
-            let metricIndex = 1
-            Object.keys(parameters).forEach(key => {
-                if (!['label', 'value', 'component', 'context', 'session_id'].includes(key)) {
-                    if (metricIndex <= 20) { // Google Analytics поддерживает до 20 custom metrics
-                        payload[`cm${metricIndex}`] = String(parameters[key])
-                        metricIndex++
+            let appVersion = 'unknown'
+            try {
+                if (typeof browser !== 'undefined' && browser.runtime && typeof browser.runtime.getManifest === 'function') {
+                    appVersion = browser.runtime.getManifest().version || appVersion
+                } else if (typeof chrome !== 'undefined' && chrome.runtime && typeof chrome.runtime.getManifest === 'function') {
+                    appVersion = chrome.runtime.getManifest().version || appVersion
+                }
+            } catch (_) {}
+
+            const endpointBase = isDevelopment ? 'https://www.google-analytics.com/debug/mp/collect' : 'https://www.google-analytics.com/mp/collect'
+            const url = `${endpointBase}?measurement_id=${encodeURIComponent(this.ga4MeasurementId)}&api_secret=${encodeURIComponent(this.ga4ApiSecret)}`
+
+            const body = {
+                client_id: this.clientId,
+                events: [{
+                    name: eventName,
+                    params: {
+                        app_name: 'Faceit Extension',
+                        app_version: appVersion,
+                        language: navigator.language,
+                        screen_resolution: `${screen.width}x${screen.height}`,
+                        ...parameters
                     }
-                }
-            })
+                }]
+            }
 
-            const body = Object.keys(payload)
-                .filter(key => payload[key] !== '' && payload[key] !== null && payload[key] !== undefined)
-                .map(key => `${key}=${encodeURIComponent(payload[key])}`)
-                .join('&')
-
-            const response = await fetch('https://www.google-analytics.com/collect', {
+            const response = await fetch(url, {
                 method: 'POST',
-                body: body,
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'User-Agent': navigator.userAgent
-                }
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
             })
 
             if (response.ok) {
-                console.log(`Analytics event sent: ${eventName}`, parameters)
+                if (isDevelopment) {
+                    const debugResult = await response.json()
+                    console.log(`GA4 debug result for event ${eventName}:`, debugResult)
+                } else {
+                    console.log(`Analytics event sent (GA4): ${eventName}`, parameters)
+                }
             } else {
-                console.error('Failed to send analytics event:', response.status)
+                console.error('Failed to send GA4 event:', response.status)
             }
         } catch (error) {
-            console.error('Failed to send event via API:', error)
+            console.error('Failed to send GA4 event:', error)
         }
     }
 
@@ -205,50 +243,58 @@ class AnalyticsService {
      * Отправка просмотра страницы через Measurement Protocol API
      * @param {string} pageName - название страницы
      */
-    async sendPageViewViaAPI(pageName) {
+    async sendPageViewViaGA4(pageName) {
         try {
-            const payload = {
-                v: '1', // Version
-                tid: this.measurementId, // Tracking ID
-                cid: this.clientId, // Client ID
-                t: 'pageview', // Hit Type
-                dp: `/${pageName}`, // Document Path
-                dt: pageName, // Document Title
-                dl: `chrome-extension://${chrome.runtime.id}/${pageName}`, // Document Location
-                dh: 'extension', // Document Hostname
-                // App info
-                an: 'Faceit Extension', // App Name
-                av: chrome.runtime.getManifest().version, // App Version
-                ua: navigator.userAgent, // User Agent
-                ul: navigator.language, // User Language
-                sr: `${screen.width}x${screen.height}`, // Screen Resolution
-                sd: `${screen.colorDepth}-bits`, // Screen Colors
-                vp: `${window.innerWidth}x${window.innerHeight}`, // Viewport Size
-                // Session info
-                cd3: this.sessionId, // Custom dimension 3 - session ID
+            if (!this.ga4MeasurementId || !this.ga4ApiSecret) {
+                console.warn('GA4 is not fully configured: missing measurementId or apiSecret')
+                return
             }
 
-            const body = Object.keys(payload)
-                .filter(key => payload[key] !== '' && payload[key] !== null && payload[key] !== undefined)
-                .map(key => `${key}=${encodeURIComponent(payload[key])}`)
-                .join('&')
-
-            const response = await fetch('https://www.google-analytics.com/collect', {
-                method: 'POST',
-                body: body,
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'User-Agent': navigator.userAgent
+            let appVersion2 = 'unknown'
+            try {
+                if (typeof browser !== 'undefined' && browser.runtime && typeof browser.runtime.getManifest === 'function') {
+                    appVersion2 = browser.runtime.getManifest().version || appVersion2
+                } else if (typeof chrome !== 'undefined' && chrome.runtime && typeof chrome.runtime.getManifest === 'function') {
+                    appVersion2 = chrome.runtime.getManifest().version || appVersion2
                 }
+            } catch (_) {}
+
+            const endpointBase = isDevelopment ? 'https://www.google-analytics.com/debug/mp/collect' : 'https://www.google-analytics.com/mp/collect'
+            const url = `${endpointBase}?measurement_id=${encodeURIComponent(this.ga4MeasurementId)}&api_secret=${encodeURIComponent(this.ga4ApiSecret)}`
+
+            const body = {
+                client_id: this.clientId,
+                events: [{
+                    name: 'page_view',
+                    params: {
+                        page_title: pageName,
+                        page_location: `chrome-extension://${(typeof browser !== 'undefined' && browser.runtime ? browser.runtime.id : (typeof chrome !== 'undefined' && chrome.runtime ? chrome.runtime.id : 'unknown'))}/${pageName}`,
+                        page_path: `/${pageName}`,
+                        app_name: 'Faceit Extension',
+                        app_version: appVersion2,
+                        viewport: `${window.innerWidth}x${window.innerHeight}`
+                    }
+                }]
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
             })
 
             if (response.ok) {
-                console.log(`Analytics page view sent: ${pageName}`)
+                if (isDevelopment) {
+                    const debugResult = await response.json()
+                    console.log('GA4 debug result for page_view:', debugResult)
+                } else {
+                    console.log(`Analytics page view sent (GA4): ${pageName}`)
+                }
             } else {
-                console.error('Failed to send analytics page view:', response.status)
+                console.error('Failed to send GA4 page view:', response.status)
             }
         } catch (error) {
-            console.error('Failed to send page view via API:', error)
+            console.error('Failed to send GA4 page view:', error)
         }
     }
 }

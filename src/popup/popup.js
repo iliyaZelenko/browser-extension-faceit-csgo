@@ -59,6 +59,14 @@ import analyticsService from './services/analytics.js'
 Vue.prototype.$browser = browser
 Vue.prototype.$analytics = analyticsService
 
+// Expose services to window for console debugging and tests
+try {
+    if (typeof window !== 'undefined') {
+        window.$analytics = analyticsService
+        window.$browser = browser
+    }
+} catch (_) {}
+
 // Инициализация Sentry для отслеживания ошибок
 initSentry(Vue)
 

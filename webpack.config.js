@@ -104,7 +104,7 @@ const config = {
                         }
 
                         jsonContent['content_security_policy'] = {
-                                extension_pages: "script-src 'self'; object-src 'self'"
+                                extension_pages: "script-src 'self'; object-src 'self'; connect-src 'self' https://open.faceit.com https://o4509418472013824.ingest.de.sentry.io https://www.google-analytics.com https://firebaseinstallations.googleapis.com https://firebaseremoteconfig.googleapis.com"
                             }
                             // Add permissions needed for hot reload
                         if (!jsonContent.permissions.includes('tabs')) {

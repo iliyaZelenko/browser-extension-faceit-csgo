@@ -309,10 +309,21 @@ export default {
   align-items: center;
   gap: 8px;
   margin-top: 10px;
+  position: relative;
 }
 
 .search-select {
   width: 100%;
+  // принудительно ограничиваем выпадающий список рамками окна
+  ::v-deep .cool-select__dropdown {
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  // если dropdown выходит за низ, заставим его рендериться выше
+  ::v-deep .cool-select__dropdown.cool-select__dropdown--position-bottom {
+    bottom: auto;
+    top: 100%;
+  }
 }
 
 .search-item {
